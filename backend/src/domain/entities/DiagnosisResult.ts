@@ -7,6 +7,9 @@ import { MBTIType } from "../valueObjects/MBTIType";
 import { LoveType } from "../valueObjects/LoveType";
 import { Attractiveness } from "../valueObjects/Attractiveness";
 import { PersonalityAxis } from "../valueObjects/PersonalityAxis";
+import { Compatibility } from "../valueObjects/Compatibility";
+import { LoveLanguage } from "../valueObjects/LoveLanguage";
+import { LifeAllocation } from "../valueObjects/LifeAllocation";
 
 /**
  * 診断結果の詳細（5つの診断項目）
@@ -14,10 +17,9 @@ import { PersonalityAxis } from "../valueObjects/PersonalityAxis";
 export interface DiagnosisResults {
   attractiveness: Attractiveness;
   personalityAxis: PersonalityAxis;
-  // 以下は後ほど実装
-  // compatibility: Compatibility;
-  // loveLanguages: LoveLanguages;
-  // lifeAllocation: LifeAllocation;
+  compatibility: Compatibility;
+  loveLanguage: LoveLanguage;
+  lifeAllocation: LifeAllocation;
 }
 
 /**
@@ -67,5 +69,17 @@ export function validateDiagnosisResult(result: DiagnosisResult): void {
 
   if (!result.results.personalityAxis) {
     throw new Error("PersonalityAxis result is required");
+  }
+
+  if (!result.results.compatibility) {
+    throw new Error("Compatibility result is required");
+  }
+
+  if (!result.results.loveLanguage) {
+    throw new Error("LoveLanguage result is required");
+  }
+
+  if (!result.results.lifeAllocation) {
+    throw new Error("LifeAllocation result is required");
   }
 }
