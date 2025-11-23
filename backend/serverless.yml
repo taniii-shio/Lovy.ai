@@ -11,6 +11,7 @@ provider:
   timeout: 30
   environment:
     STAGE: ${self:provider.stage}
+    NODE_ENV: ${self:provider.stage}
   logs:
     restApi: true
   iam:
@@ -22,18 +23,33 @@ provider:
             - logs:CreateLogStream
             - logs:PutLogEvents
           Resource: "*"
+  apiGateway:
+    restApiId: !Ref ApiGatewayRestApi
+    shouldStartNameWithService: true
 
 plugins:
   - serverless-plugin-typescript
 
 functions:
-  hello:
-    handler: src/handlers/hello.handler
+  diagnosis:
+    handler: src/interface/http/DiagnosisHandler.handler
     events:
       - http:
-          path: /hello
-          method: get
-          cors: true
+          path: /api/v1/diagnosis
+          method: post
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
+          throttling:
+            maxRequestsPerSecond: 10
+            maxConcurrentRequests: 5
 
 package:
   individually: true
@@ -44,3 +60,5 @@ package:
     - "!.serverless/**"
     - "!.build/**"
     - "!*.md"
+    - "!tests/**"
+    - "!*.test.ts"
