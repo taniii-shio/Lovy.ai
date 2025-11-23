@@ -1,0 +1,46 @@
+service: lovy-ai-api
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'ap-northeast-1'}
+  memorySize: 256
+  timeout: 30
+  environment:
+    STAGE: ${self:provider.stage}
+  logs:
+    restApi: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: "*"
+
+plugins:
+  - serverless-plugin-typescript
+
+functions:
+  hello:
+    handler: src/handlers/hello.handler
+    events:
+      - http:
+          path: /hello
+          method: get
+          cors: true
+
+package:
+  individually: true
+  patterns:
+    - "!.git/**"
+    - "!.vscode/**"
+    - "!node_modules/**"
+    - "!.serverless/**"
+    - "!.build/**"
+    - "!*.md"
