@@ -57,9 +57,34 @@ type LoveType = `${LoveAxis1}${LoveAxis2}${LoveAxis3}${LoveAxis4}`;
 
 #### Attractiveness
 ```typescript
+// モテ度の3つのサブスコア
+interface AttractivenessScores {
+  totalScore: number;        // 総合スコア（3つの平均値） 0-100
+  chance: number;            // 出会いのチャンス量 0-100
+  firstImpression: number;   // 第一印象 0-100
+  lastingLikeability: number; // 継続好感度 0-100
+}
+
+// 各サブスコアのレベル（S1〜S5）
+interface AttractivenessLevels {
+  chance: string;            // S1〜S5
+  firstImpression: string;   // S1〜S5
+  lastingLikeability: string; // S1〜S5
+}
+
+// 各サブスコアの説明テキスト
+interface AttractivenessTexts {
+  chance: string;            // 出会いのチャンス量の説明
+  firstImpression: string;   // 第一印象の説明
+  lastingLikeability: string; // 継続好感度の説明
+  summary: string;           // 統合サマリテキスト
+}
+
+// Attractivenessの完全な値オブジェクト
 interface Attractiveness {
-  totalScore: number;   // 0-100
-  description: string;
+  scores: AttractivenessScores;
+  levels: AttractivenessLevels;
+  texts: AttractivenessTexts;
 }
 ```
 
@@ -79,10 +104,33 @@ interface Compatibility {
 
 #### PersonalityAxis
 ```typescript
-interface PersonalityAxis {
-  topThreeTraits: string[];  // 上位3つの性格特性
-  description: string;       // 性格の説明テキスト
+// 性格ベクトルの1つの軸
+interface PersonalityVectorItem {
+  key: string;    // 軸のキー（例: "extraversion"）
+  label: string;  // 軸のラベル（例: "外向性"）
+  score: number;  // スコア 0〜100
+  level: string;  // レベル S1〜S5
+  text: string;   // 説明文
 }
+
+// 性格ベクトル全体（11軸の性格特性）
+interface PersonalityAxis {
+  top3: PersonalityVectorItem[];   // 表示用ベスト3（スコア降順）
+  allAxes: PersonalityVectorItem[]; // 全11軸（内部利用 or 拡張用）
+}
+
+// 11軸の定義
+// 1. 外向性 (extraversion)
+// 2. 内面志向 (introversionDepth)
+// 3. 直観／ロマン性 (intuitionRomance)
+// 4. 現実／実務性 (realism)
+// 5. 論理性 (thinking)
+// 6. 共感性 (feeling)
+// 7. 構造化・計画性 (structure)
+// 8. 柔軟・フットワーク (flexibility)
+// 9. 甘えニーズ (cuddleNeed)
+// 10. 甘え受容力 (acceptWarmth)
+// 11. 主導性 (leadAttitude)
 ```
 
 #### LoveLanguage

@@ -91,8 +91,7 @@ Accept: application/json
         // }
       },
       "personalityAxis": {
-        "topThreeTraits": ["社交性", "内面思考", "直感"],
-        "description": "あなたは共感力が高く、人を引き寄せる魅力があります..."
+        "topThreeTraits": []
       },
       "compatibility": {
         "top3": [
