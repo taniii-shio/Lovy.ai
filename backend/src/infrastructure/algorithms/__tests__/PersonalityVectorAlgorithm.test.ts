@@ -1,5 +1,7 @@
 import { getFlags } from "../common/TypeFlags";
 import { calcPersonalityVector } from "../PersonalityVectorAlgorithm";
+import { MBTI_TYPES } from "../../../domain/valueObjects/MBTIType";
+import { LOVE_TYPES } from "../../../domain/valueObjects/LoveType";
 
 describe("PersonalityVectorAlgorithm", () => {
   describe("calcPersonalityVector", () => {
@@ -158,6 +160,294 @@ describe("PersonalityVectorAlgorithm", () => {
       expect(top3Keys).toContain("introversionDepth");
       expect(top3Keys).toContain("thinking");
       expect(top3Keys).toContain("structure");
+    });
+  });
+
+  describe("Comprehensive: All MBTI x LoveType combinations", () => {
+    it("should successfully calculate personality vector for all 256 combinations", () => {
+      let successCount = 0;
+      let failureCount = 0;
+      const failures: Array<{ mbti: string; loveType: string; error: string }> = [];
+
+      // Test all 16 MBTI × 16 LoveType = 256 combinations
+      MBTI_TYPES.forEach((mbti) => {
+        LOVE_TYPES.forEach((loveType) => {
+          try {
+            const flags = getFlags(mbti, loveType);
+            const result = calcPersonalityVector(flags);
+
+            // Validate structure
+            expect(result).toHaveProperty("allAxes");
+            expect(result).toHaveProperty("top3");
+
+            // Validate allAxes has 11 axes
+            expect(result.allAxes).toHaveLength(11);
+
+            // Validate top3 has 3 items
+            expect(result.top3).toHaveLength(3);
+
+            // Validate all axes have required properties
+            result.allAxes.forEach((axis) => {
+              expect(axis).toHaveProperty("key");
+              expect(axis).toHaveProperty("label");
+              expect(axis).toHaveProperty("score");
+              expect(axis).toHaveProperty("level");
+              expect(axis).toHaveProperty("text");
+
+              // Validate score range
+              expect(axis.score).toBeGreaterThanOrEqual(0);
+              expect(axis.score).toBeLessThanOrEqual(100);
+
+              // Validate level format
+              expect(axis.level).toMatch(/^S[1-5]$/);
+
+              // Validate text is non-empty
+              expect(axis.text.length).toBeGreaterThan(0);
+            });
+
+            // Validate top3 is sorted by score (descending)
+            expect(result.top3[0].score).toBeGreaterThanOrEqual(result.top3[1].score);
+            expect(result.top3[1].score).toBeGreaterThanOrEqual(result.top3[2].score);
+
+            // Validate top3 items are from allAxes
+            result.top3.forEach((topItem) => {
+              const found = result.allAxes.find(
+                (axis) => axis.key === topItem.key && axis.score === topItem.score
+              );
+              expect(found).toBeDefined();
+            });
+
+            successCount++;
+          } catch (error) {
+            failureCount++;
+            failures.push({
+              mbti,
+              loveType,
+              error: error instanceof Error ? error.message : String(error),
+            });
+          }
+        });
+      });
+
+      // Report results
+      if (failures.length > 0) {
+        console.error(`Failed combinations (${failureCount}/256):`, failures);
+      }
+
+      expect(successCount).toBe(256);
+      expect(failureCount).toBe(0);
+    });
+
+    it("should verify all 11 axes are always present", () => {
+      const expectedAxes = [
+        "extraversion",
+        "introversionDepth",
+        "intuitionRomance",
+        "realism",
+        "thinking",
+        "feeling",
+        "structure",
+        "flexibility",
+        "cuddleNeed",
+        "acceptWarmth",
+        "leadAttitude",
+      ];
+
+      // Test all 256 combinations
+      MBTI_TYPES.forEach((mbti) => {
+        LOVE_TYPES.forEach((loveType) => {
+          const flags = getFlags(mbti, loveType);
+          const result = calcPersonalityVector(flags);
+
+          const axisKeys = result.allAxes.map((axis) => axis.key);
+
+          // All expected axes should be present
+          expectedAxes.forEach((expectedKey) => {
+            expect(axisKeys).toContain(expectedKey);
+          });
+
+          // No extra axes should be present
+          expect(axisKeys).toHaveLength(11);
+        });
+      });
+    });
+
+    it("should produce valid level distribution across all combinations", () => {
+      const levelCountsByAxis: Record<string, Record<string, number>> = {};
+
+      // Initialize counters
+      const axisKeys = [
+        "extraversion",
+        "introversionDepth",
+        "intuitionRomance",
+        "realism",
+        "thinking",
+        "feeling",
+        "structure",
+        "flexibility",
+        "cuddleNeed",
+        "acceptWarmth",
+        "leadAttitude",
+      ];
+
+      axisKeys.forEach((key) => {
+        levelCountsByAxis[key] = { S1: 0, S2: 0, S3: 0, S4: 0, S5: 0 };
+      });
+
+      // Collect level distributions
+      MBTI_TYPES.forEach((mbti) => {
+        LOVE_TYPES.forEach((loveType) => {
+          const flags = getFlags(mbti, loveType);
+          const result = calcPersonalityVector(flags);
+
+          result.allAxes.forEach((axis) => {
+            levelCountsByAxis[axis.key][axis.level]++;
+          });
+        });
+      });
+
+      // Verify all 256 combinations were counted for each axis
+      axisKeys.forEach((key) => {
+        const total = Object.values(levelCountsByAxis[key]).reduce(
+          (sum, count) => sum + count,
+          0
+        );
+        expect(total).toBe(256);
+      });
+
+      console.log("Level distribution by axis:", levelCountsByAxis);
+    });
+
+    it("should verify score-to-level mapping consistency for all combinations", () => {
+      // Test all 256 combinations to ensure score-to-level mapping is correct
+      MBTI_TYPES.forEach((mbti) => {
+        LOVE_TYPES.forEach((loveType) => {
+          const flags = getFlags(mbti, loveType);
+          const result = calcPersonalityVector(flags);
+
+          // Helper function to verify score matches level (S5 scale)
+          const verifyScoreLevel = (score: number, level: string) => {
+            if (score >= 80) expect(level).toBe("S5");
+            else if (score >= 60) expect(level).toBe("S4");
+            else if (score >= 40) expect(level).toBe("S3");
+            else if (score >= 20) expect(level).toBe("S2");
+            else expect(level).toBe("S1");
+          };
+
+          // Verify all axes
+          result.allAxes.forEach((axis) => {
+            verifyScoreLevel(axis.score, axis.level);
+          });
+
+          // Verify top3
+          result.top3.forEach((item) => {
+            verifyScoreLevel(item.score, item.level);
+          });
+        });
+      });
+    });
+
+    it("should produce diverse top3 combinations across all types", () => {
+      const top3Combinations = new Set<string>();
+
+      MBTI_TYPES.forEach((mbti) => {
+        LOVE_TYPES.forEach((loveType) => {
+          const flags = getFlags(mbti, loveType);
+          const result = calcPersonalityVector(flags);
+
+          // Create a signature for this top3 combination
+          const top3Keys = result.top3.map((item) => item.key).sort().join(",");
+          top3Combinations.add(top3Keys);
+        });
+      });
+
+      console.log(`Unique top3 combinations: ${top3Combinations.size}`);
+      console.log("Sample combinations:", Array.from(top3Combinations).slice(0, 10));
+
+      // Should have multiple different top3 combinations (not all the same)
+      expect(top3Combinations.size).toBeGreaterThan(1);
+    });
+
+    it("should verify all axis labels are correctly assigned", () => {
+      const expectedLabels: Record<string, string> = {
+        extraversion: "外向性",
+        introversionDepth: "内面志向",
+        intuitionRomance: "直観／ロマン性",
+        realism: "現実／実務性",
+        thinking: "論理性",
+        feeling: "共感性",
+        structure: "構造化・計画性",
+        flexibility: "柔軟・フットワーク",
+        cuddleNeed: "甘えニーズ",
+        acceptWarmth: "甘え受容力",
+        leadAttitude: "主導性",
+      };
+
+      // Test with a sample combination
+      const flags = getFlags("INFJ", "LCRO");
+      const result = calcPersonalityVector(flags);
+
+      result.allAxes.forEach((axis) => {
+        expect(axis.label).toBe(expectedLabels[axis.key]);
+      });
+    });
+
+    it("should calculate composite scores correctly for intuitionRomance and realism", () => {
+      // Test specific combinations to verify composite score calculations
+      MBTI_TYPES.forEach((mbti) => {
+        LOVE_TYPES.forEach((loveType) => {
+          const flags = getFlags(mbti, loveType);
+          const result = calcPersonalityVector(flags);
+
+          // Find intuitionRomance and realism
+          const intuitionRomance = result.allAxes.find(
+            (a) => a.key === "intuitionRomance"
+          );
+          const realism = result.allAxes.find((a) => a.key === "realism");
+
+          // Verify they exist
+          expect(intuitionRomance).toBeDefined();
+          expect(realism).toBeDefined();
+
+          if (intuitionRomance && realism) {
+            // intuitionRomance = (0.7*N + 0.3*Pl) * 100
+            const expectedIntuition = (0.7 * flags.N + 0.3 * flags.Pl) * 100;
+            expect(intuitionRomance.score).toBeCloseTo(expectedIntuition, 5);
+
+            // realism = (0.7*S + 0.3*R) * 100
+            const expectedRealism = (0.7 * flags.S + 0.3 * flags.R) * 100;
+            expect(realism.score).toBeCloseTo(expectedRealism, 5);
+          }
+        });
+      });
+    });
+
+    it("should verify binary axes are either 0 or 100", () => {
+      const binaryAxes = [
+        "extraversion",
+        "introversionDepth",
+        "thinking",
+        "feeling",
+        "structure",
+        "flexibility",
+        "cuddleNeed",
+        "acceptWarmth",
+        "leadAttitude",
+      ];
+
+      MBTI_TYPES.forEach((mbti) => {
+        LOVE_TYPES.forEach((loveType) => {
+          const flags = getFlags(mbti, loveType);
+          const result = calcPersonalityVector(flags);
+
+          result.allAxes.forEach((axis) => {
+            if (binaryAxes.includes(axis.key)) {
+              // Binary axes should be 0 or 100
+              expect([0, 100]).toContain(axis.score);
+            }
+          });
+        });
+      });
     });
   });
 });
