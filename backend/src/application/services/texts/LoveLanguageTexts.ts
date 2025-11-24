@@ -1,17 +1,9 @@
-// =============== ④ 愛情表現 (カジュアル版) ===============
+// 愛情表現アルゴリズムのテキストマッピング
 
-import { TypeFlags } from "./common/TypeFlags";
-import { toS5 } from "./common/ScoreBuckets";
-import {
-  LoveLanguage,
-  LoveLanguageItem,
-  LoveLanguageKey,
-  LOVE_LANGUAGE_LABELS,
-  createLoveLanguage,
-} from "../../domain/valueObjects/LoveLanguage";
-
-//【採用テキスト】愛情表現5種 × S1〜S5 の辞書 (カジュアル全開)
-const loveTexts: Record<LoveLanguageKey, Record<string, string>> = {
+/**
+ * 愛情表現5種 × S1〜S5 のテキスト辞書（カジュアル版）
+ */
+export const loveTexts: Record<string, Record<string, string>> = {
   words: { // 言葉
     S5: "言葉がマジで大事。「好き」「ありがとう」「すごいね」を毎日言ってほしいタイプ。これが愛情のガソリンになる。",
     S4: "ちゃんと言葉にしてくれないと不安になる。「言わなくてもわかるでしょ」は通用しない。ストレートな言葉が一番響く。",
@@ -48,47 +40,3 @@ const loveTexts: Record<LoveLanguageKey, Record<string, string>> = {
     S1: "あんまりベタベタされるの好きじゃない。心の距離が近ければ、物理的な距離は遠くても平気。",
   },
 };
-
-// スコア計算ロジック
-export function calcLoveLanguages(flags: TypeFlags): LoveLanguage {
-  const { Fm, N, El, I, Fl, A, J, Tm, R, E, C, Pl } = flags;
-
-  const rawWords = 0.50 * Fm + 0.30 * N + 0.20 * El;
-  const rawTime  = 0.45 * I  + 0.25 * Fm + 0.20 * Fl + 0.10 * A;
-  const rawGifts = 0.40 * N  + 0.35 * J  + 0.25 * El;
-  const rawServ  = 0.40 * J  + 0.35 * Tm + 0.25 * R;
-  const rawTouch = 0.55 * E  + 0.25 * C  + 0.20 * Pl;
-
-  const scoreWords = Math.min(100, rawWords * 100);
-  const scoreTime  = Math.min(100, rawTime  * 100);
-  const scoreGifts = Math.min(100, rawGifts * 100);
-  const scoreServ  = Math.min(100, rawServ  * 100);
-  const scoreTouch = Math.min(100, rawTouch * 100);
-
-  const items: LoveLanguageItem[] = [
-    { key: "words", label: LOVE_LANGUAGE_LABELS.words, score: scoreWords, rank: 0, level: "", text: "" },
-    { key: "time", label: LOVE_LANGUAGE_LABELS.time, score: scoreTime, rank: 0, level: "", text: "" },
-    { key: "gifts", label: LOVE_LANGUAGE_LABELS.gifts, score: scoreGifts, rank: 0, level: "", text: "" },
-    { key: "service", label: LOVE_LANGUAGE_LABELS.service, score: scoreServ, rank: 0, level: "", text: "" },
-    { key: "touch", label: LOVE_LANGUAGE_LABELS.touch, score: scoreTouch, rank: 0, level: "", text: "" },
-  ];
-
-  // スコア順に並べて rank とテキストを付与
-  items.sort((a, b) => b.score - a.score);
-  items.forEach((item, idx) => {
-    item.rank = idx + 1;
-    const level = toS5(item.score);
-    item.level = level;
-    item.text = loveTexts[item.key][level];
-  });
-
-  const top1 = items[0];
-  const top2 = items[1];
-
-  // サマリーテキストもカジュアルに
-  const summary =
-    `あなたにとって一番大事なのは「${top1.label}」。これが満たされると、マジで幸せを感じるはず。` +
-    `次にグッとくるのは「${top2.label}」。この2つをパートナーにそっと教えてあげると、関係がもっと良くなるかも！`;
-
-  return createLoveLanguage(items, summary);
-}

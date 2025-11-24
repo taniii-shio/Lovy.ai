@@ -16,15 +16,15 @@ import {
   createDiagnosisResult,
   validateDiagnosisResult,
 } from "../src/domain/entities/DiagnosisResult";
-import { getFlags } from "../src/infrastructure/algorithms/common/TypeFlags";
-import { buildAttractivenessResult } from "../src/infrastructure/algorithms/PopularityAlgorithm";
-import { calcPersonalityVector } from "../src/infrastructure/algorithms/PersonalityVectorAlgorithm";
+import { getFlags } from "../src/application/services/common/TypeFlags";
+import { buildAttractivenessResult } from "../src/application/services/PopularityAlgorithm";
+import { calcPersonalityVector } from "../src/application/services/PersonalityVectorAlgorithm";
 import {
   buildCompatibilityResult,
   calcCompatScore,
-} from "../src/infrastructure/algorithms/CompatibilityAlgorithm";
-import { calcLoveLanguages } from "../src/infrastructure/algorithms/LoveLanguageAlgorithm";
-import { calcLifeAllocation } from "../src/infrastructure/algorithms/LifeAllocationAlgorithm";
+} from "../src/application/services/CompatibilityAlgorithm";
+import { calcLoveLanguages } from "../src/application/services/LoveLanguageAlgorithm";
+import { calcLifeAllocation } from "../src/application/services/LifeAllocationAlgorithm";
 
 /**
  * コマンドライン引数を解析
@@ -187,11 +187,7 @@ function createTestDiagnosisResult(
   // ③ 相性（全256通りの組み合わせを計算）
   console.log("  ③ 相性を計算中（全256通りの組み合わせ）...");
   const bestPartners = calculateBestPartners(mbti, loveType);
-  const compatibility = buildCompatibilityResult(
-    mbti,
-    loveType,
-    bestPartners
-  );
+  const compatibility = buildCompatibilityResult(mbti, loveType, bestPartners);
   console.log("  ✅ 相性計算完了");
 
   // ④ 愛情表現

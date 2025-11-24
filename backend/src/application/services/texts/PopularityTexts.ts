@@ -1,17 +1,9 @@
-// =============== ① モテ度 (S10段階・カジュアル版) ===============
+// モテ度アルゴリズムのテキストマッピング
 
-import { TypeFlags } from "./common/TypeFlags";
-import { toS10 } from "./common/ScoreBuckets";
-import {
-  Attractiveness,
-  AttractivenessScores,
-  AttractivenessLevels,
-  AttractivenessTexts,
-  createAttractiveness,
-} from "../../domain/valueObjects/Attractiveness";
-
-//【採用テキスト】チャンス量 S1〜S10 (カジュアル全開)
-const chanceTextsByLevel: Record<string, string> = {
+/**
+ * チャンス量 S1〜S10 のテキスト辞書（カジュアル版）
+ */
+export const chanceTextsByLevel: Record<string, string> = {
   S10: "マジで歩くパワースポット。いるだけで人が集まるし、フッ軽だから恋の種まき量がエグい。黙ってても恋が始まる強者。",
   S9: "恋のハンター。面白いイベントや新しい出会いを嗅ぎつける天才。基本どこにでもいるし、いつの間にか輪の中心にいる。",
   S8: "陽キャ代表。誘われたら断らないし、自分から企画するのも好き。だから自然と恋の打席に立つ回数がめちゃ多い。",
@@ -24,8 +16,10 @@ const chanceTextsByLevel: Record<string, string> = {
   S1: "もはや仙人レベル。自分の世界が完成されすぎてて、新しい人が入る隙間がほぼない。恋は降って湧くのを待つスタイル。",
 };
 
-//【採用テキスト】第一印象 S1〜S10 (カジュアル全開)
-const firstImpressionTextsByLevel: Record<string, string> = {
+/**
+ * 第一印象 S1〜S10 のテキスト辞書（カジュアル版）
+ */
+export const firstImpressionTextsByLevel: Record<string, string> = {
   S10: "初対面で沼らせる天才。笑顔と話し方が神すぎて、気づいたら相手はあなたのことを考えてる。もはや罪。",
   S9: "最強の愛嬌モンスター。なんか知らんけどめちゃくちゃ話しかけやすいオーラが出てる。老若男女に好かれる太陽みたいな人。",
   S8: "場の支配者。いるだけでその場が明るくなるムードメーカー。親しみやすさMAXで、秒で心を開かせちゃう。",
@@ -38,8 +32,10 @@ const firstImpressionTextsByLevel: Record<string, string> = {
   S1: "結界張りがち。話しかけるなオーラがすごいけど、それは自分を守るため。実はガラスのハートの持ち主。",
 };
 
-//【採用テキスト】継続好感度 S1〜S10 (カジュアル全開)
-const lastingTextsByLevel: Record<string, string> = {
+/**
+ * 継続好感度 S1〜S10 のテキスト辞書（カジュアル版）
+ */
+export const lastingTextsByLevel: Record<string, string> = {
   S10: "もはや沼。一緒にいればいるほど「この人しかいない」って思わせる中毒性がある。安心感と刺激のバランスが神がかってる。",
   S9: "人生のパートナー候補。誠実さと優しさがダダ漏れで、将来を考えさせる安心感がすごい。一緒にいて全く疲れない。",
   S8: "心の栄養剤。落ち込んでる時に会いたくなる人。肯定してくれるし、いつも味方でいてくれる信頼感が半端ない。",
@@ -51,79 +47,3 @@ const lastingTextsByLevel: Record<string, string> = {
   S2: "一人の時間がないと無理なタイプ。ずっと一緒だと息が詰まっちゃうから、会わない時間がお互いのための冷却期間になる。",
   S1: "熱しやすく冷めやすい風来坊。長期的な安定よりも、その瞬間の「楽しい！」が一番大事。去る者追わず来る者拒まず。",
 };
-
-// スコア計算ロジック（重みを微調整し、スコアがばらけやすく）
-export function calcAttractivenessScores(flags: TypeFlags): AttractivenessScores {
-  const { E, J, L, O, Fm, C, Pl, El, R, I, Pm, N } = flags;
-
-  // チャンス量：外向性(E)、主導性(L)、楽観性(O)に加え、計画性(J)と柔軟性(Pm)のバランスを考慮
-  const rawChance =
-    0.35 * E +
-    0.20 * L +
-    0.15 * O +
-    0.15 * J +
-    0.15 * Pm; // 合計 1.0
-
-  // 第一印象：外向性(E)、共感性(Fm)、甘え(C)に加え、情熱(Pl)と直感(N)の影響力を強化
-  const rawFirst =
-    0.25 * E +
-    0.25 * Fm +
-    0.20 * C +
-    0.20 * Pl +
-    0.10 * N; // 合計 1.0
-
-  // 継続好感度：誠実さ(El)、現実性(R)を重視しつつ、共感性(Fm)と計画性(J)の影響を維持し、内向性(I)の深みも加点
-  const rawLasting =
-    0.30 * El +
-    0.25 * R +
-    0.20 * Fm +
-    0.15 * J +
-    0.10 * I; // 合計 1.0
-
-  const chance = Math.min(100, rawChance * 100); // 念のため100点を超えないように
-  const firstImpression = Math.min(100, rawFirst * 100);
-  const lastingLikeability = Math.min(100, rawLasting * 100);
-
-  // 3つのスコアの平均値を計算
-  const totalScore = (chance + firstImpression + lastingLikeability) / 3;
-
-  return {
-    totalScore,
-    chance,
-    firstImpression,
-    lastingLikeability,
-  };
-}
-
-// レベル & テキスト生成
-export function buildAttractivenessResult(flags: TypeFlags): Attractiveness {
-  const scores = calcAttractivenessScores(flags);
-
-  const levelChance = toS10(scores.chance);
-  const levelFirst = toS10(scores.firstImpression);
-  const levelLast = toS10(scores.lastingLikeability);
-
-  const textChance = chanceTextsByLevel[levelChance];
-  const textFirst = firstImpressionTextsByLevel[levelFirst];
-  const textLast = lastingTextsByLevel[levelLast];
-
-  const summary =
-    `出会いの多さについては、${textChance} ` +
-    `初対面では、${textFirst} ` +
-    `そして長く付き合うと、${textLast}`;
-
-  const levels: AttractivenessLevels = {
-    chance: levelChance,
-    firstImpression: levelFirst,
-    lastingLikeability: levelLast,
-  };
-
-  const texts: AttractivenessTexts = {
-    chance: textChance,
-    firstImpression: textFirst,
-    lastingLikeability: textLast,
-    summary,
-  };
-
-  return createAttractiveness(scores, levels, texts);
-}

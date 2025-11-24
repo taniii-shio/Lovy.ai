@@ -132,52 +132,41 @@ describe("CompatibilityAlgorithm", () => {
   });
 
   describe("buildCompatibilityResult", () => {
-    it("should create complete compatibility result with best and worst matches", () => {
+    it("should create complete compatibility result with best matches", () => {
       const bestPartners = [
         { mbti: "INFJ" as MBTIType, loveType: "LCRO" as LoveType },
         { mbti: "ENFP" as MBTIType, loveType: "FAPE" as LoveType },
-      ];
-      const worstPartners = [
-        { mbti: "ESTJ" as MBTIType, loveType: "LARE" as LoveType },
-        { mbti: "ISTP" as MBTIType, loveType: "FCPE" as LoveType },
       ];
 
       const result = buildCompatibilityResult(
         "INFJ" as MBTIType,
         "LCRO" as LoveType,
-        bestPartners,
-        worstPartners
+        bestPartners
       );
 
-      expect(result).toHaveProperty("matches");
-      expect(result.matches).toHaveProperty("best");
-      expect(result.matches).toHaveProperty("worst");
-      expect(result.matches.best).toHaveLength(2);
-      expect(result.matches.worst).toHaveLength(2);
+      expect(result).toHaveProperty("bestMatches");
+      expect(result.bestMatches).toHaveLength(2);
       expect(result).toHaveProperty("summary");
       expect(result.summary.length).toBeGreaterThan(0);
     });
 
     it("should produce consistent results for same inputs", () => {
       const bestPartners = [{ mbti: "ENFP" as MBTIType, loveType: "FAPE" as LoveType }];
-      const worstPartners = [{ mbti: "ESTJ" as MBTIType, loveType: "LARE" as LoveType }];
 
       const result1 = buildCompatibilityResult(
         "INTJ" as MBTIType,
         "LCRO" as LoveType,
-        bestPartners,
-        worstPartners
+        bestPartners
       );
       const result2 = buildCompatibilityResult(
         "INTJ" as MBTIType,
         "LCRO" as LoveType,
-        bestPartners,
-        worstPartners
+        bestPartners
       );
 
-      expect(result1.matches.best[0].score).toBe(result2.matches.best[0].score);
-      expect(result1.matches.best[0].level).toBe(result2.matches.best[0].level);
-      expect(result1.matches.best[0].relationFlavor).toBe(result2.matches.best[0].relationFlavor);
+      expect(result1.bestMatches[0].score).toBe(result2.bestMatches[0].score);
+      expect(result1.bestMatches[0].level).toBe(result2.bestMatches[0].level);
+      expect(result1.bestMatches[0].relationFlavor).toBe(result2.bestMatches[0].relationFlavor);
     });
 
     it("should generate appropriate summary based on dominant flavor", () => {
@@ -185,13 +174,11 @@ describe("CompatibilityAlgorithm", () => {
         { mbti: "INFJ" as MBTIType, loveType: "LCRO" as LoveType },
         { mbti: "INTJ" as MBTIType, loveType: "LCRO" as LoveType },
       ];
-      const worstPartners = [{ mbti: "ESTP" as MBTIType, loveType: "FAPE" as LoveType }];
 
       const result = buildCompatibilityResult(
         "INFJ" as MBTIType,
         "LCRO" as LoveType,
-        soulmatePartners,
-        worstPartners
+        soulmatePartners
       );
 
       expect(result.summary).toBeTruthy();

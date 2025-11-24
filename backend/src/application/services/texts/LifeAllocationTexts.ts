@@ -1,17 +1,9 @@
-// =============== ⑤ 人生の時間配分 (カジュアル版) ===============
+// 人生の時間配分アルゴリズムのテキストマッピング
 
-import { TypeFlags } from "./common/TypeFlags";
-import { levelFromPercent } from "./common/ScoreBuckets";
-import {
-  LifeAllocation,
-  LifeItem,
-  LifeKey,
-  LIFE_ALLOCATION_LABELS,
-  createLifeAllocation,
-} from "../../domain/valueObjects/LifeAllocation";
-
-//【採用テキスト】人生の時間配分5種 × S1〜S5 の辞書 (カジュアル全開)
-const lifeTexts: Record<LifeKey, Record<string, string>> = {
+/**
+ * 人生の時間配分5種 × S1〜S5 のテキスト辞書（カジュアル版）
+ */
+export const lifeTexts: Record<string, Record<string, string>> = {
   partner: { // 恋人
     S5: "人生の9割くらい恋愛でできてる。恋人がいるかいないかで、マジで世界の彩りが変わるタイプ。",
     S4: "恋愛の優先順位、かなり高め。仕事も友達も大事だけど、結局恋人との時間が一番の充電になる。",
@@ -48,44 +40,3 @@ const lifeTexts: Record<LifeKey, Record<string, string>> = {
     S1: "趣味って何？ってレベル。好きなことはあるけど、それに時間やお金をかけるほどじゃないと思ってる。",
   },
 };
-
-// スコア計算ロジック
-export function calcLifeAllocation(flags: TypeFlags): LifeAllocation {
-  const { Fm, N, C, A, Pl, J, Tm, R, El, E, I, Pm, O } = flags;
-
-  const rawPartner = 0.35 * Fm + 0.25 * N + 0.20 * C + 0.15 * A + 0.05 * Pl;
-  const rawWork    = 0.40 * J + 0.30 * Tm + 0.20 * R + 0.10 * El;
-  const rawFriends = 0.50 * E + 0.30 * N + 0.20 * O;
-  const rawFamily  = 0.35 * Fm + 0.35 * J + 0.30 * El;
-  const rawHobbies = 0.35 * I + 0.35 * N + 0.20 * Pm + 0.10 * O;
-
-  const sumRaw = rawPartner + rawWork + rawFriends + rawFamily + rawHobbies;
-
-  const items: LifeItem[] = [
-    { key: "partner", label: LIFE_ALLOCATION_LABELS.partner, percent: (rawPartner / sumRaw) * 100, level: "", text: "" },
-    { key: "work", label: LIFE_ALLOCATION_LABELS.work, percent: (rawWork / sumRaw) * 100, level: "", text: "" },
-    { key: "friends", label: LIFE_ALLOCATION_LABELS.friends, percent: (rawFriends / sumRaw) * 100, level: "", text: "" },
-    { key: "family", label: LIFE_ALLOCATION_LABELS.family, percent: (rawFamily / sumRaw) * 100, level: "", text: "" },
-    { key: "hobbies", label: LIFE_ALLOCATION_LABELS.hobbies, percent: (rawHobbies / sumRaw) * 100, level: "", text: "" },
-  ];
-
-  // レベルとテキストを付与
-  items.forEach(item => {
-    const level = levelFromPercent(item.percent);
-    item.level = level;
-    item.text = lifeTexts[item.key][level];
-  });
-
-  // パーセンテージ降順でソート
-  items.sort((a, b) => b.percent - a.percent);
-
-  const top1 = items[0];
-  const top2 = items[1];
-
-  // サマリーテキストもカジュアルに
-  const summary =
-    `あなたの人生で一番リソースを割きやすいのは「${top1.label}」。たぶん、人生の喜びの多くはここにある。` +
-    `次に大事にしてるのは「${top2.label}」。この2つのバランスが、あなたの生き方そのものかもね。`;
-
-  return createLifeAllocation(items, summary);
-}

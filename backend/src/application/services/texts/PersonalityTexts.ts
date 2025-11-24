@@ -1,15 +1,9 @@
-// =============== ② 性格ベクトル（Top3 抽出版） ===============
+// 性格ベクトルアルゴリズムのテキストマッピング
 
-import { TypeFlags } from "./common/TypeFlags";
-import { toS5 } from "./common/ScoreBuckets";
-import {
-  PersonalityAxis,
-  PersonalityVectorItem,
-  createPersonalityAxis,
-} from "../../domain/valueObjects/PersonalityAxis";
-
-//【採用テキスト】11軸 × S1〜S5 の辞書 (カジュアル全開・非重複)
-const personalityTexts: Record<string, Record<string, string>> = {
+/**
+ * 11軸 × S1〜S5 のテキスト辞書（カジュアル版・非重複）
+ */
+export const personalityTexts: Record<string, Record<string, string>> = {
   extraversion: { // 外向性
     S5: "超絶パリピ。エネルギー源は完全に人との交流。充電ケーブルが他人につながってるタイプ。",
     S4: "お祭り大好きマン。楽しいことがある場所に自然と吸い寄せられる。グループの起爆剤。",
@@ -88,35 +82,3 @@ const personalityTexts: Record<string, Record<string, string>> = {
     S1: "究極の受け身。「なんでもいいよ〜」が口癖で、決断は100%他人に委ねたい。",
   },
 };
-
-// 性格ベクトル計算（Top3 抽出）
-export function calcPersonalityVector(flags: TypeFlags): PersonalityAxis {
-  const { E, I, N, S, Fm, Tm, J, Pm, C, A, R, Pl, L } = flags;
-
-  const axes: PersonalityVectorItem[] = [
-    { key: "extraversion", label: "外向性", score: E * 100, level: "", text: "" },
-    { key: "introversionDepth", label: "内面志向", score: I * 100, level: "", text: "" },
-    { key: "intuitionRomance", label: "直観／ロマン性", score: (0.7 * N + 0.3 * Pl) * 100, level: "", text: "" },
-    { key: "realism", label: "現実／実務性", score: (0.7 * S + 0.3 * R) * 100, level: "", text: "" },
-    { key: "thinking", label: "論理性", score: Tm * 100, level: "", text: "" },
-    { key: "feeling", label: "共感性", score: Fm * 100, level: "", text: "" },
-    { key: "structure", label: "構造化・計画性", score: J * 100, level: "", text: "" },
-    { key: "flexibility", label: "柔軟・フットワーク", score: Pm * 100, level: "", text: "" },
-    { key: "cuddleNeed", label: "甘えニーズ", score: C * 100, level: "", text: "" },
-    { key: "acceptWarmth", label: "甘え受容力", score: A * 100, level: "", text: "" },
-    { key: "leadAttitude", label: "主導性", score: L * 100, level: "", text: "" },
-  ];
-
-  // 各軸にレベルとテキストを付与
-  axes.forEach(axis => {
-    const level = toS5(axis.score);
-    axis.level = level;
-    axis.text = personalityTexts[axis.key][level];
-  });
-
-  // スコア降順でソートし、上位3つを抽出
-  const sorted = [...axes].sort((a, b) => b.score - a.score);
-  const top3 = sorted.slice(0, 3);
-
-  return createPersonalityAxis(top3, axes);
-}

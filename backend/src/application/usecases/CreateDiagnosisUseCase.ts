@@ -5,15 +5,15 @@ import {
   createDiagnosisResult,
   validateDiagnosisResult,
 } from "../../domain/entities/DiagnosisResult";
-import { getFlags } from "../../infrastructure/algorithms/common/TypeFlags";
-import { buildAttractivenessResult } from "../../infrastructure/algorithms/PopularityAlgorithm";
-import { calcPersonalityVector } from "../../infrastructure/algorithms/PersonalityVectorAlgorithm";
+import { getFlags } from "../services/common/TypeFlags";
+import { buildAttractivenessResult } from "../services/PopularityAlgorithm";
+import { calcPersonalityVector } from "../services/PersonalityVectorAlgorithm";
 import {
   buildCompatibilityResult,
   calcCompatScore,
-} from "../../infrastructure/algorithms/CompatibilityAlgorithm";
-import { calcLoveLanguages } from "../../infrastructure/algorithms/LoveLanguageAlgorithm";
-import { calcLifeAllocation } from "../../infrastructure/algorithms/LifeAllocationAlgorithm";
+} from "../services/CompatibilityAlgorithm";
+import { calcLoveLanguages } from "../services/LoveLanguageAlgorithm";
+import { calcLifeAllocation } from "../services/LifeAllocationAlgorithm";
 
 /**
  * 診断結果作成UseCase
