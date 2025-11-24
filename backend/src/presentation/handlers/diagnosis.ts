@@ -27,7 +27,18 @@ export const handler = async (
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Credentials": allowedOrigin !== "*" ? "true" : "false",
+    "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+    "Access-Control-Allow-Methods": "OPTIONS,POST",
   };
+
+  // Handle preflight OPTIONS request
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers,
+      body: "",
+    };
+  }
 
   try {
     // リクエストボディの解析
