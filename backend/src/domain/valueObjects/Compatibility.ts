@@ -31,18 +31,10 @@ export interface CompatibilityMatch {
 }
 
 /**
- * ベストマッチとワーストマッチ
- */
-export interface BestWorstMatches {
-  best: CompatibilityMatch[];
-  worst: CompatibilityMatch[];
-}
-
-/**
  * Compatibilityの完全な値オブジェクト
  */
 export interface Compatibility {
-  matches: BestWorstMatches;
+  bestMatches: CompatibilityMatch[];
   summary: string; // 相性の総合説明文
 }
 
@@ -76,15 +68,15 @@ export function createCompatibilityMatch(
  * Compatibilityオブジェクトを作成
  */
 export function createCompatibility(
-  matches: BestWorstMatches,
+  bestMatches: CompatibilityMatch[],
   summary: string
 ): Compatibility {
   // バリデーション
-  validateMatches(matches);
+  validateBestMatches(bestMatches);
   validateSummary(summary);
 
   return {
-    matches,
+    bestMatches,
     summary,
   };
 }
@@ -174,27 +166,19 @@ function validateSummary(summary: string): void {
 }
 
 /**
- * BestWorstMatchesのバリデーション
+ * BestMatchesのバリデーション
  */
-function validateMatches(matches: BestWorstMatches): void {
-  if (!matches.best || !Array.isArray(matches.best)) {
+function validateBestMatches(bestMatches: CompatibilityMatch[]): void {
+  if (!bestMatches || !Array.isArray(bestMatches)) {
     throw new Error("Best matches must be an array");
   }
 
-  if (!matches.worst || !Array.isArray(matches.worst)) {
-    throw new Error("Worst matches must be an array");
-  }
-
-  if (matches.best.length === 0) {
+  if (bestMatches.length === 0) {
     throw new Error("Best matches cannot be empty");
   }
 
-  if (matches.worst.length === 0) {
-    throw new Error("Worst matches cannot be empty");
-  }
-
   // 各マッチのバリデーション
-  matches.best.forEach((match, index) => {
+  bestMatches.forEach((match, index) => {
     try {
       validatePartner(match.partner);
       validateScore(match.score);
@@ -204,20 +188,6 @@ function validateMatches(matches: BestWorstMatches): void {
     } catch (error) {
       throw new Error(
         `Invalid best match at index ${index}: ${error instanceof Error ? error.message : String(error)}`
-      );
-    }
-  });
-
-  matches.worst.forEach((match, index) => {
-    try {
-      validatePartner(match.partner);
-      validateScore(match.score);
-      validateLevel(match.level);
-      validateRelationFlavor(match.relationFlavor);
-      validateDescription(match.description);
-    } catch (error) {
-      throw new Error(
-        `Invalid worst match at index ${index}: ${error instanceof Error ? error.message : String(error)}`
       );
     }
   });

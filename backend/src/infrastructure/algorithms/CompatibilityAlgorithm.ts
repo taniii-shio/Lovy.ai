@@ -8,7 +8,6 @@ import {
   Compatibility,
   CompatibilityMatch,
   CompatibilityPartner,
-  BestWorstMatches,
   RelationFlavor,
   createCompatibility,
   createCompatibilityMatch,
@@ -205,25 +204,17 @@ export function buildCompatibilityMatch(
 export function buildCompatibilityResult(
   selfMbti: MBTIType,
   selfLoveType: LoveType,
-  bestPartners: Array<{ mbti: MBTIType; loveType: LoveType }>,
-  worstPartners: Array<{ mbti: MBTIType; loveType: LoveType }>
+  bestPartners: Array<{ mbti: MBTIType; loveType: LoveType }>
 ): Compatibility {
   // ベストマッチを作成
-  const best = bestPartners.map((p) =>
+  const bestMatches = bestPartners.map((p) =>
     buildCompatibilityMatch(selfMbti, selfLoveType, p.mbti, p.loveType)
   );
-
-  // ワーストマッチを作成
-  const worst = worstPartners.map((p) =>
-    buildCompatibilityMatch(selfMbti, selfLoveType, p.mbti, p.loveType)
-  );
-
-  const matches: BestWorstMatches = { best, worst };
 
   // サマリー生成
-  const summary = generateCompatibilitySummary(best, worst);
+  const summary = generateCompatibilitySummary(bestMatches);
 
-  return createCompatibility(matches, summary);
+  return createCompatibility(bestMatches, summary);
 }
 
 // ===============================
@@ -231,10 +222,9 @@ export function buildCompatibilityResult(
 // ===============================
 
 function generateCompatibilitySummary(
-  best: CompatibilityMatch[],
-  _worst: CompatibilityMatch[]
+  bestMatches: CompatibilityMatch[]
 ): string {
-  const bestFlavors = best.map((m) => m.relationFlavor);
+  const bestFlavors = bestMatches.map((m) => m.relationFlavor);
 
   const flavorCount = {
     soulmate: 0,
