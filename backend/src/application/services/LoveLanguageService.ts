@@ -1,4 +1,4 @@
-// =============== ④ 愛情表現 (プレゼンテーション層) ===============
+// =============== ④ 愛情表現 ===============
 
 import { TypeFlags } from "./common/TypeFlags";
 import { toS5 } from "./common/ScoreBuckets";
@@ -18,7 +18,7 @@ export function calcLoveLanguages(flags: TypeFlags): LoveLanguage {
   const scores = calculateLoveLanguageScores(flags);
 
   // スコアをテキスト付きのアイテムに変換
-  const items: LoveLanguageItem[] = scores.items.map(langScore => {
+  const items: LoveLanguageItem[] = scores.items.map((langScore) => {
     const level = toS5(langScore.score);
     return {
       key: langScore.key,

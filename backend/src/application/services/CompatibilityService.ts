@@ -1,6 +1,4 @@
-// ===============================
-// ③ 相性 (プレゼンテーション層)
-// ===============================
+// ===============  ③ 相性 ===============
 
 import { TypeFlags, getFlags } from "./common/TypeFlags";
 import { toS10 } from "./common/ScoreBuckets";
@@ -21,7 +19,10 @@ import { calculateCompatibilityScore } from "../../domain/services/Compatibility
  * 相性スコアを計算（ドメインサービスへの委譲）
  * @deprecated この関数は後方互換性のために残されています。直接 calculateCompatibilityScore を使用してください。
  */
-export function calcCompatScore(selfFlags: TypeFlags, otherFlags: TypeFlags): number {
+export function calcCompatScore(
+  selfFlags: TypeFlags,
+  otherFlags: TypeFlags
+): number {
   return calculateCompatibilityScore(selfFlags, otherFlags).score;
 }
 
@@ -55,7 +56,9 @@ function getCompatibilityDescription(
 // 解説文を動的に生成する（オンラインでの表示用、エクスポート版）
 // ===============================
 
-export function buildCompatibilityDescription(entry: CompatibilityMatch): string {
+export function buildCompatibilityDescription(
+  entry: CompatibilityMatch
+): string {
   // マトリクスから、フレーバーとレベルに合った文章を直接取得する
   const flavor = entry.relationFlavor;
   const level = entry.level;
@@ -90,7 +93,13 @@ export function buildCompatibilityMatch(
     loveType: partnerLoveType,
   };
 
-  return createCompatibilityMatch(partner, score, level, relationFlavor, description);
+  return createCompatibilityMatch(
+    partner,
+    score,
+    level,
+    relationFlavor,
+    description
+  );
 }
 
 // ===============================

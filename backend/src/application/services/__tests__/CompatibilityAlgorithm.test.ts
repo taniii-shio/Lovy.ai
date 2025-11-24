@@ -3,7 +3,7 @@ import {
   calcRelationFlavor,
   buildCompatibilityMatch,
   buildCompatibilityResult,
-} from "../CompatibilityAlgorithm";
+} from "../CompatibilityService";
 import { getFlags } from "../common/TypeFlags";
 import { RelationFlavor } from "../../../domain/valueObjects/Compatibility";
 import { MBTIType, MBTI_TYPES } from "../../../domain/valueObjects/MBTIType";
@@ -83,7 +83,12 @@ describe("CompatibilityAlgorithm", () => {
 
   describe("buildCompatibilityMatch", () => {
     it("should create compatibility match with all required fields", () => {
-      const match = buildCompatibilityMatch("INFJ" as MBTIType, "LCRO" as LoveType, "ENFP" as MBTIType, "FAPE" as LoveType);
+      const match = buildCompatibilityMatch(
+        "INFJ" as MBTIType,
+        "LCRO" as LoveType,
+        "ENFP" as MBTIType,
+        "FAPE" as LoveType
+      );
 
       expect(match).toHaveProperty("partner");
       expect(match.partner.mbti).toBe("ENFP");
@@ -94,7 +99,9 @@ describe("CompatibilityAlgorithm", () => {
       expect(match).toHaveProperty("level");
       expect(match.level).toMatch(/^S(10|[1-9])$/);
       expect(match).toHaveProperty("relationFlavor");
-      expect(["soulmate", "partner", "hybrid", "magnet"]).toContain(match.relationFlavor);
+      expect(["soulmate", "partner", "hybrid", "magnet"]).toContain(
+        match.relationFlavor
+      );
       expect(match).toHaveProperty("description");
       expect(match.description.length).toBeGreaterThan(0);
     });
@@ -114,13 +121,33 @@ describe("CompatibilityAlgorithm", () => {
         // Find a combination that produces this flavor and high score
         let match;
         if (flavor === "soulmate") {
-          match = buildCompatibilityMatch("INFJ" as MBTIType, "LCRO" as LoveType, "INFJ" as MBTIType, "LCRO" as LoveType);
+          match = buildCompatibilityMatch(
+            "INFJ" as MBTIType,
+            "LCRO" as LoveType,
+            "INFJ" as MBTIType,
+            "LCRO" as LoveType
+          );
         } else if (flavor === "partner") {
-          match = buildCompatibilityMatch("INTJ" as MBTIType, "LCRO" as LoveType, "ESFP" as MBTIType, "FAPE" as LoveType);
+          match = buildCompatibilityMatch(
+            "INTJ" as MBTIType,
+            "LCRO" as LoveType,
+            "ESFP" as MBTIType,
+            "FAPE" as LoveType
+          );
         } else if (flavor === "hybrid") {
-          match = buildCompatibilityMatch("INFJ" as MBTIType, "LCRO" as LoveType, "ESFP" as MBTIType, "FCRO" as LoveType);
+          match = buildCompatibilityMatch(
+            "INFJ" as MBTIType,
+            "LCRO" as LoveType,
+            "ESFP" as MBTIType,
+            "FCRO" as LoveType
+          );
         } else {
-          match = buildCompatibilityMatch("INTJ" as MBTIType, "LCRO" as LoveType, "ESFP" as MBTIType, "LCPE" as LoveType);
+          match = buildCompatibilityMatch(
+            "INTJ" as MBTIType,
+            "LCRO" as LoveType,
+            "ESFP" as MBTIType,
+            "LCPE" as LoveType
+          );
         }
 
         expect(match.relationFlavor).toBe(flavor);
@@ -151,7 +178,9 @@ describe("CompatibilityAlgorithm", () => {
     });
 
     it("should produce consistent results for same inputs", () => {
-      const bestPartners = [{ mbti: "ENFP" as MBTIType, loveType: "FAPE" as LoveType }];
+      const bestPartners = [
+        { mbti: "ENFP" as MBTIType, loveType: "FAPE" as LoveType },
+      ];
 
       const result1 = buildCompatibilityResult(
         "INTJ" as MBTIType,
@@ -166,7 +195,9 @@ describe("CompatibilityAlgorithm", () => {
 
       expect(result1.bestMatches[0].score).toBe(result2.bestMatches[0].score);
       expect(result1.bestMatches[0].level).toBe(result2.bestMatches[0].level);
-      expect(result1.bestMatches[0].relationFlavor).toBe(result2.bestMatches[0].relationFlavor);
+      expect(result1.bestMatches[0].relationFlavor).toBe(
+        result2.bestMatches[0].relationFlavor
+      );
     });
 
     it("should generate appropriate summary based on dominant flavor", () => {
@@ -188,7 +219,12 @@ describe("CompatibilityAlgorithm", () => {
 
   describe("Integration: Score and Level consistency", () => {
     it("should assign S10 for scores >= 90", () => {
-      const match = buildCompatibilityMatch("INFJ" as MBTIType, "LCRO" as LoveType, "INFJ" as MBTIType, "LCRO" as LoveType);
+      const match = buildCompatibilityMatch(
+        "INFJ" as MBTIType,
+        "LCRO" as LoveType,
+        "INFJ" as MBTIType,
+        "LCRO" as LoveType
+      );
       if (match.score >= 90) {
         expect(match.level).toBe("S10");
       }
@@ -197,9 +233,24 @@ describe("CompatibilityAlgorithm", () => {
     it("should assign appropriate level based on score ranges", () => {
       // Test multiple combinations to cover different score ranges
       const testCases: Array<[MBTIType, LoveType, MBTIType, LoveType]> = [
-        ["INFJ" as MBTIType, "LCRO" as LoveType, "INFJ" as MBTIType, "LCRO" as LoveType], // Should be very high
-        ["INTJ" as MBTIType, "LCRO" as LoveType, "ESFP" as MBTIType, "FAPE" as LoveType], // Should be lower
-        ["ENFP" as MBTIType, "FCRE" as LoveType, "ENFP" as MBTIType, "LCPE" as LoveType], // Medium-high
+        [
+          "INFJ" as MBTIType,
+          "LCRO" as LoveType,
+          "INFJ" as MBTIType,
+          "LCRO" as LoveType,
+        ], // Should be very high
+        [
+          "INTJ" as MBTIType,
+          "LCRO" as LoveType,
+          "ESFP" as MBTIType,
+          "FAPE" as LoveType,
+        ], // Should be lower
+        [
+          "ENFP" as MBTIType,
+          "FCRE" as LoveType,
+          "ENFP" as MBTIType,
+          "LCPE" as LoveType,
+        ], // Medium-high
       ];
 
       testCases.forEach(([mbti1, love1, mbti2, love2]) => {
@@ -224,7 +275,11 @@ describe("CompatibilityAlgorithm", () => {
     it("should successfully create CompatibilityMatch for all 256 self type combinations", () => {
       let successCount = 0;
       let failureCount = 0;
-      const failures: Array<{ mbti: MBTIType; loveType: LoveType; error: string }> = [];
+      const failures: Array<{
+        mbti: MBTIType;
+        loveType: LoveType;
+        error: string;
+      }> = [];
 
       // Test all 16 MBTI × 16 LoveType = 256 combinations as self
       MBTI_TYPES.forEach((mbti) => {
@@ -278,7 +333,11 @@ describe("CompatibilityAlgorithm", () => {
     it("should successfully create CompatibilityMatch for all 256 partner type combinations", () => {
       let successCount = 0;
       let failureCount = 0;
-      const failures: Array<{ mbti: MBTIType; loveType: LoveType; error: string }> = [];
+      const failures: Array<{
+        mbti: MBTIType;
+        loveType: LoveType;
+        error: string;
+      }> = [];
 
       // Test fixed self against all 256 partner combinations
       MBTI_TYPES.forEach((mbti) => {
@@ -352,7 +411,10 @@ describe("CompatibilityAlgorithm", () => {
       });
 
       // All 256 combinations should be categorized
-      const total = Object.values(flavorCounts).reduce((sum, count) => sum + count, 0);
+      const total = Object.values(flavorCounts).reduce(
+        (sum, count) => sum + count,
+        0
+      );
       expect(total).toBe(256);
 
       // Each flavor should appear at least once (algorithm coverage)
@@ -392,7 +454,10 @@ describe("CompatibilityAlgorithm", () => {
       });
 
       // All 256 combinations should be categorized
-      const total = Object.values(levelCounts).reduce((sum, count) => sum + count, 0);
+      const total = Object.values(levelCounts).reduce(
+        (sum, count) => sum + count,
+        0
+      );
       expect(total).toBe(256);
 
       console.log("Score level distribution:", levelCounts);

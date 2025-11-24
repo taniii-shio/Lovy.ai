@@ -6,14 +6,14 @@ import {
   validateDiagnosisResult,
 } from "../../domain/entities/DiagnosisResult";
 import { getFlags } from "../services/common/TypeFlags";
-import { buildAttractivenessResult } from "../services/PopularityAlgorithm";
-import { calcPersonalityVector } from "../services/PersonalityVectorAlgorithm";
+import { buildAttractivenessResult } from "../services/PopularityService";
+import { calcPersonalityVector } from "../services/PersonalityVectorService";
 import {
   buildCompatibilityResult,
   calcCompatScore,
-} from "../services/CompatibilityAlgorithm";
-import { calcLoveLanguages } from "../services/LoveLanguageAlgorithm";
-import { calcLifeAllocation } from "../services/LifeAllocationAlgorithm";
+} from "../services/CompatibilityService";
+import { calcLoveLanguages } from "../services/LoveLanguageService";
+import { calcLifeAllocation } from "../services/LifeAllocationService";
 
 /**
  * 診断結果作成UseCase

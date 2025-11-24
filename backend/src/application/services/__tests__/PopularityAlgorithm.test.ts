@@ -2,7 +2,7 @@ import { getFlags } from "../common/TypeFlags";
 import {
   calcAttractivenessScores,
   buildAttractivenessResult,
-} from "../PopularityAlgorithm";
+} from "../PopularityService";
 import { MBTI_TYPES } from "../../../domain/valueObjects/MBTIType";
 import { LOVE_TYPES } from "../../../domain/valueObjects/LoveType";
 
@@ -102,7 +102,8 @@ describe("PopularityAlgorithm", () => {
     it("should successfully calculate attractiveness for all 256 combinations", () => {
       let successCount = 0;
       let failureCount = 0;
-      const failures: Array<{ mbti: string; loveType: string; error: string }> = [];
+      const failures: Array<{ mbti: string; loveType: string; error: string }> =
+        [];
 
       // Test all 16 MBTI × 16 LoveType = 256 combinations
       MBTI_TYPES.forEach((mbti) => {
@@ -122,7 +123,11 @@ describe("PopularityAlgorithm", () => {
             expect(scores.totalScore).toBeLessThanOrEqual(100);
 
             // Validate totalScore is average of the three scores
-            const expectedTotal = (scores.chance + scores.firstImpression + scores.lastingLikeability) / 3;
+            const expectedTotal =
+              (scores.chance +
+                scores.firstImpression +
+                scores.lastingLikeability) /
+              3;
             expect(scores.totalScore).toBeCloseTo(expectedTotal, 5);
 
             successCount++;
@@ -149,7 +154,8 @@ describe("PopularityAlgorithm", () => {
     it("should successfully build attractiveness result for all 256 combinations", () => {
       let successCount = 0;
       let failureCount = 0;
-      const failures: Array<{ mbti: string; loveType: string; error: string }> = [];
+      const failures: Array<{ mbti: string; loveType: string; error: string }> =
+        [];
 
       // Test all 256 combinations
       MBTI_TYPES.forEach((mbti) => {
@@ -208,13 +214,40 @@ describe("PopularityAlgorithm", () => {
 
     it("should produce valid level distribution across all combinations", () => {
       const chanceLevelCounts: Record<string, number> = {
-        S1: 0, S2: 0, S3: 0, S4: 0, S5: 0, S6: 0, S7: 0, S8: 0, S9: 0, S10: 0,
+        S1: 0,
+        S2: 0,
+        S3: 0,
+        S4: 0,
+        S5: 0,
+        S6: 0,
+        S7: 0,
+        S8: 0,
+        S9: 0,
+        S10: 0,
       };
       const firstImpressionLevelCounts: Record<string, number> = {
-        S1: 0, S2: 0, S3: 0, S4: 0, S5: 0, S6: 0, S7: 0, S8: 0, S9: 0, S10: 0,
+        S1: 0,
+        S2: 0,
+        S3: 0,
+        S4: 0,
+        S5: 0,
+        S6: 0,
+        S7: 0,
+        S8: 0,
+        S9: 0,
+        S10: 0,
       };
       const lastingLevelCounts: Record<string, number> = {
-        S1: 0, S2: 0, S3: 0, S4: 0, S5: 0, S6: 0, S7: 0, S8: 0, S9: 0, S10: 0,
+        S1: 0,
+        S2: 0,
+        S3: 0,
+        S4: 0,
+        S5: 0,
+        S6: 0,
+        S7: 0,
+        S8: 0,
+        S9: 0,
+        S10: 0,
       };
 
       // Test all 256 combinations
@@ -230,17 +263,32 @@ describe("PopularityAlgorithm", () => {
       });
 
       // All 256 combinations should be categorized
-      const chanceTotal = Object.values(chanceLevelCounts).reduce((sum, count) => sum + count, 0);
-      const firstTotal = Object.values(firstImpressionLevelCounts).reduce((sum, count) => sum + count, 0);
-      const lastingTotal = Object.values(lastingLevelCounts).reduce((sum, count) => sum + count, 0);
+      const chanceTotal = Object.values(chanceLevelCounts).reduce(
+        (sum, count) => sum + count,
+        0
+      );
+      const firstTotal = Object.values(firstImpressionLevelCounts).reduce(
+        (sum, count) => sum + count,
+        0
+      );
+      const lastingTotal = Object.values(lastingLevelCounts).reduce(
+        (sum, count) => sum + count,
+        0
+      );
 
       expect(chanceTotal).toBe(256);
       expect(firstTotal).toBe(256);
       expect(lastingTotal).toBe(256);
 
       console.log("Chance level distribution:", chanceLevelCounts);
-      console.log("First impression level distribution:", firstImpressionLevelCounts);
-      console.log("Lasting likeability level distribution:", lastingLevelCounts);
+      console.log(
+        "First impression level distribution:",
+        firstImpressionLevelCounts
+      );
+      console.log(
+        "Lasting likeability level distribution:",
+        lastingLevelCounts
+      );
     });
 
     it("should produce diverse score ranges across all combinations", () => {
@@ -320,8 +368,14 @@ describe("PopularityAlgorithm", () => {
           };
 
           verifyScoreLevel(result.scores.chance, result.levels.chance);
-          verifyScoreLevel(result.scores.firstImpression, result.levels.firstImpression);
-          verifyScoreLevel(result.scores.lastingLikeability, result.levels.lastingLikeability);
+          verifyScoreLevel(
+            result.scores.firstImpression,
+            result.levels.firstImpression
+          );
+          verifyScoreLevel(
+            result.scores.lastingLikeability,
+            result.levels.lastingLikeability
+          );
         });
       });
     });

@@ -1,4 +1,4 @@
-// =============== ⑤ 人生の時間配分 (プレゼンテーション層) ===============
+// =============== ⑤ 人生の時間配分 ===============
 
 import { TypeFlags } from "./common/TypeFlags";
 import { levelFromPercent } from "./common/ScoreBuckets";
@@ -18,7 +18,7 @@ export function calcLifeAllocation(flags: TypeFlags): LifeAllocation {
   const scores = calculateLifeAllocationScores(flags);
 
   // スコアをテキスト付きのアイテムに変換
-  const items: LifeItem[] = scores.items.map(allocationScore => {
+  const items: LifeItem[] = scores.items.map((allocationScore) => {
     const level = levelFromPercent(allocationScore.percent);
     return {
       key: allocationScore.key,

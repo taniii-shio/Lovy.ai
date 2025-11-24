@@ -1,5 +1,5 @@
 import { getFlags } from "../common/TypeFlags";
-import { calcLifeAllocation } from "../LifeAllocationAlgorithm";
+import { calcLifeAllocation } from "../LifeAllocationService";
 import { MBTI_TYPES } from "../../../domain/valueObjects/MBTIType";
 import { LOVE_TYPES } from "../../../domain/valueObjects/LoveType";
 import { LIFE_ALLOCATION_KEYS } from "../../../domain/valueObjects/LifeAllocation";
@@ -48,21 +48,21 @@ describe("LifeAllocationAlgorithm", () => {
       // sumRaw = 0.75 + 0.70 + 0.80 + 1.00 + 0.35 = 3.60
 
       const partner = result.items.find((item) => item.key === "partner");
-      expect(partner?.percent).toBeCloseTo((0.75 / 3.60) * 100, 1);
+      expect(partner?.percent).toBeCloseTo((0.75 / 3.6) * 100, 1);
 
       const work = result.items.find((item) => item.key === "work");
-      expect(work?.percent).toBeCloseTo((0.70 / 3.60) * 100, 1);
+      expect(work?.percent).toBeCloseTo((0.7 / 3.6) * 100, 1);
 
       const friends = result.items.find((item) => item.key === "friends");
-      expect(friends?.percent).toBeCloseTo((0.80 / 3.60) * 100, 1);
+      expect(friends?.percent).toBeCloseTo((0.8 / 3.6) * 100, 1);
 
       const family = result.items.find((item) => item.key === "family");
-      expect(family?.percent).toBeCloseTo((1.00 / 3.60) * 100, 1);
+      expect(family?.percent).toBeCloseTo((1.0 / 3.6) * 100, 1);
       // family が最も高いので S3 になるはず (27.8%)
       expect(family?.level).toBe("S3");
 
       const hobbies = result.items.find((item) => item.key === "hobbies");
-      expect(hobbies?.percent).toBeCloseTo((0.35 / 3.60) * 100, 1);
+      expect(hobbies?.percent).toBeCloseTo((0.35 / 3.6) * 100, 1);
     });
 
     it("should have items sorted by percent (descending order)", () => {
@@ -71,7 +71,9 @@ describe("LifeAllocationAlgorithm", () => {
 
       // パーセンテージの降順に並んでいることを確認
       for (let i = 0; i < result.items.length - 1; i++) {
-        expect(result.items[i].percent).toBeGreaterThanOrEqual(result.items[i + 1].percent);
+        expect(result.items[i].percent).toBeGreaterThanOrEqual(
+          result.items[i + 1].percent
+        );
       }
     });
 
@@ -79,7 +81,10 @@ describe("LifeAllocationAlgorithm", () => {
       const flags = getFlags("ENFJ", "FARE");
       const result = calcLifeAllocation(flags);
 
-      const totalPercent = result.items.reduce((sum, item) => sum + item.percent, 0);
+      const totalPercent = result.items.reduce(
+        (sum, item) => sum + item.percent,
+        0
+      );
       expect(totalPercent).toBeCloseTo(100, 0);
     });
 
@@ -112,21 +117,21 @@ describe("LifeAllocationAlgorithm", () => {
       // sumRaw = 0.45 + 0.90 + 0.50 + 0.35 + 0.80 = 3.00
 
       const partner = result.items.find((item) => item.key === "partner");
-      expect(partner?.percent).toBeCloseTo((0.45 / 3.00) * 100, 1);
+      expect(partner?.percent).toBeCloseTo((0.45 / 3.0) * 100, 1);
 
       const work = result.items.find((item) => item.key === "work");
-      expect(work?.percent).toBeCloseTo((0.90 / 3.00) * 100, 1);
+      expect(work?.percent).toBeCloseTo((0.9 / 3.0) * 100, 1);
       // work が最も高いので S3 になるはず (30%)
       expect(work?.level).toBe("S3");
 
       const friends = result.items.find((item) => item.key === "friends");
-      expect(friends?.percent).toBeCloseTo((0.50 / 3.00) * 100, 1);
+      expect(friends?.percent).toBeCloseTo((0.5 / 3.0) * 100, 1);
 
       const family = result.items.find((item) => item.key === "family");
-      expect(family?.percent).toBeCloseTo((0.35 / 3.00) * 100, 1);
+      expect(family?.percent).toBeCloseTo((0.35 / 3.0) * 100, 1);
 
       const hobbies = result.items.find((item) => item.key === "hobbies");
-      expect(hobbies?.percent).toBeCloseTo((0.80 / 3.00) * 100, 1);
+      expect(hobbies?.percent).toBeCloseTo((0.8 / 3.0) * 100, 1);
     });
 
     it("should generate appropriate summary text mentioning top 2 allocations", () => {
@@ -150,7 +155,8 @@ describe("LifeAllocationAlgorithm", () => {
     it("should successfully calculate life allocations for all 256 combinations", () => {
       let successCount = 0;
       let failureCount = 0;
-      const failures: Array<{ mbti: string; loveType: string; error: string }> = [];
+      const failures: Array<{ mbti: string; loveType: string; error: string }> =
+        [];
 
       // Test all 16 MBTI × 16 LoveType = 256 combinations
       MBTI_TYPES.forEach((mbti) => {
@@ -195,7 +201,10 @@ describe("LifeAllocationAlgorithm", () => {
             });
 
             // Validate percentages sum to ~100%
-            const totalPercent = result.items.reduce((sum, item) => sum + item.percent, 0);
+            const totalPercent = result.items.reduce(
+              (sum, item) => sum + item.percent,
+              0
+            );
             expect(totalPercent).toBeCloseTo(100, 0);
 
             successCount++;
@@ -240,7 +249,10 @@ describe("LifeAllocationAlgorithm", () => {
     });
 
     it("should produce valid level distribution across all combinations", () => {
-      const levelCountsByAllocation: Record<string, Record<string, number>> = {};
+      const levelCountsByAllocation: Record<
+        string,
+        Record<string, number>
+      > = {};
 
       // Initialize counters
       LIFE_ALLOCATION_KEYS.forEach((key) => {
@@ -268,7 +280,10 @@ describe("LifeAllocationAlgorithm", () => {
         expect(total).toBe(256);
       });
 
-      console.log("Level distribution by life allocation:", levelCountsByAllocation);
+      console.log(
+        "Level distribution by life allocation:",
+        levelCountsByAllocation
+      );
     });
 
     it("should verify percent-to-level mapping consistency for all combinations", () => {
@@ -303,7 +318,9 @@ describe("LifeAllocationAlgorithm", () => {
 
           // Verify that items are sorted in descending percent order
           for (let i = 0; i < result.items.length - 1; i++) {
-            expect(result.items[i].percent).toBeGreaterThanOrEqual(result.items[i + 1].percent);
+            expect(result.items[i].percent).toBeGreaterThanOrEqual(
+              result.items[i + 1].percent
+            );
           }
         });
       });
@@ -325,7 +342,10 @@ describe("LifeAllocationAlgorithm", () => {
       });
 
       console.log(`Unique top allocations: ${topAllocations.size}`);
-      console.log("Allocations that appear as top:", Array.from(topAllocations));
+      console.log(
+        "Allocations that appear as top:",
+        Array.from(topAllocations)
+      );
 
       // Should have multiple different top allocations (not all the same)
       expect(topAllocations.size).toBeGreaterThan(1);
@@ -357,12 +377,20 @@ describe("LifeAllocationAlgorithm", () => {
           const result = calcLifeAllocation(flags);
 
           // Calculate expected raw scores
-          const rawPartner = 0.35 * flags.Fm + 0.25 * flags.N + 0.20 * flags.C + 0.15 * flags.A + 0.05 * flags.Pl;
-          const rawWork    = 0.40 * flags.J + 0.30 * flags.Tm + 0.20 * flags.R + 0.10 * flags.El;
-          const rawFriends = 0.50 * flags.E + 0.30 * flags.N + 0.20 * flags.O;
-          const rawFamily  = 0.35 * flags.Fm + 0.35 * flags.J + 0.30 * flags.El;
-          const rawHobbies = 0.35 * flags.I + 0.35 * flags.N + 0.20 * flags.Pm + 0.10 * flags.O;
-          const sumRaw = rawPartner + rawWork + rawFriends + rawFamily + rawHobbies;
+          const rawPartner =
+            0.35 * flags.Fm +
+            0.25 * flags.N +
+            0.2 * flags.C +
+            0.15 * flags.A +
+            0.05 * flags.Pl;
+          const rawWork =
+            0.4 * flags.J + 0.3 * flags.Tm + 0.2 * flags.R + 0.1 * flags.El;
+          const rawFriends = 0.5 * flags.E + 0.3 * flags.N + 0.2 * flags.O;
+          const rawFamily = 0.35 * flags.Fm + 0.35 * flags.J + 0.3 * flags.El;
+          const rawHobbies =
+            0.35 * flags.I + 0.35 * flags.N + 0.2 * flags.Pm + 0.1 * flags.O;
+          const sumRaw =
+            rawPartner + rawWork + rawFriends + rawFamily + rawHobbies;
 
           // partner
           const partner = result.items.find((item) => item.key === "partner");
@@ -412,7 +440,10 @@ describe("LifeAllocationAlgorithm", () => {
           const flags = getFlags(mbti, loveType);
           const result = calcLifeAllocation(flags);
 
-          const totalPercent = result.items.reduce((sum, item) => sum + item.percent, 0);
+          const totalPercent = result.items.reduce(
+            (sum, item) => sum + item.percent,
+            0
+          );
           expect(totalPercent).toBeCloseTo(100, 0);
         });
       });

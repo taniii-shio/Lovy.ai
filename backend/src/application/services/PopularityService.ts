@@ -1,4 +1,4 @@
-// =============== ① モテ度 (プレゼンテーション層) ===============
+// =============== ① モテ度 ===============
 
 import { TypeFlags } from "./common/TypeFlags";
 import { toS10 } from "./common/ScoreBuckets";
@@ -20,7 +20,9 @@ import { calculatePopularityScores } from "../../domain/services/PopularityCalcu
  * モテ度スコアを計算（ドメインサービスへの委譲）
  * @deprecated この関数は後方互換性のために残されています。直接 calculatePopularityScores を使用してください。
  */
-export function calcAttractivenessScores(flags: TypeFlags): AttractivenessScores {
+export function calcAttractivenessScores(
+  flags: TypeFlags
+): AttractivenessScores {
   return calculatePopularityScores(flags);
 }
 

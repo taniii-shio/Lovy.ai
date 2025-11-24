@@ -1,5 +1,5 @@
 import { getFlags } from "../common/TypeFlags";
-import { calcLoveLanguages } from "../LoveLanguageAlgorithm";
+import { calcLoveLanguages } from "../LoveLanguageService";
 import { MBTI_TYPES } from "../../../domain/valueObjects/MBTIType";
 import { LOVE_TYPES } from "../../../domain/valueObjects/LoveType";
 import { LOVE_LANGUAGE_KEYS } from "../../../domain/valueObjects/LoveLanguage";
@@ -154,7 +154,8 @@ describe("LoveLanguageAlgorithm", () => {
     it("should successfully calculate love languages for all 256 combinations", () => {
       let successCount = 0;
       let failureCount = 0;
-      const failures: Array<{ mbti: string; loveType: string; error: string }> = [];
+      const failures: Array<{ mbti: string; loveType: string; error: string }> =
+        [];
 
       // Test all 16 MBTI × 16 LoveType = 256 combinations
       MBTI_TYPES.forEach((mbti) => {
@@ -277,7 +278,10 @@ describe("LoveLanguageAlgorithm", () => {
         expect(total).toBe(256);
       });
 
-      console.log("Level distribution by love language:", levelCountsByLanguage);
+      console.log(
+        "Level distribution by love language:",
+        levelCountsByLanguage
+      );
     });
 
     it("should verify score-to-level mapping consistency for all combinations", () => {
@@ -313,7 +317,9 @@ describe("LoveLanguageAlgorithm", () => {
           // Verify that ranks are assigned in descending score order
           for (let rank = 1; rank <= 4; rank++) {
             const currentItem = result.items.find((item) => item.rank === rank);
-            const nextItem = result.items.find((item) => item.rank === rank + 1);
+            const nextItem = result.items.find(
+              (item) => item.rank === rank + 1
+            );
 
             expect(currentItem).toBeDefined();
             expect(nextItem).toBeDefined();
@@ -342,7 +348,10 @@ describe("LoveLanguageAlgorithm", () => {
       });
 
       console.log(`Unique rank 1 love languages: ${rank1Languages.size}`);
-      console.log("Languages that appear as rank 1:", Array.from(rank1Languages));
+      console.log(
+        "Languages that appear as rank 1:",
+        Array.from(rank1Languages)
+      );
 
       // Should have multiple different rank 1 languages (not all the same)
       expect(rank1Languages.size).toBeGreaterThan(1);
@@ -375,27 +384,46 @@ describe("LoveLanguageAlgorithm", () => {
 
           // words: 0.50 * Fm + 0.30 * N + 0.20 * El
           const words = result.items.find((item) => item.key === "words");
-          const expectedWords = Math.min(100, (0.50 * flags.Fm + 0.30 * flags.N + 0.20 * flags.El) * 100);
+          const expectedWords = Math.min(
+            100,
+            (0.5 * flags.Fm + 0.3 * flags.N + 0.2 * flags.El) * 100
+          );
           expect(words?.score).toBeCloseTo(expectedWords, 5);
 
           // time: 0.45 * I + 0.25 * Fm + 0.20 * Fl + 0.10 * A
           const time = result.items.find((item) => item.key === "time");
-          const expectedTime = Math.min(100, (0.45 * flags.I + 0.25 * flags.Fm + 0.20 * flags.Fl + 0.10 * flags.A) * 100);
+          const expectedTime = Math.min(
+            100,
+            (0.45 * flags.I +
+              0.25 * flags.Fm +
+              0.2 * flags.Fl +
+              0.1 * flags.A) *
+              100
+          );
           expect(time?.score).toBeCloseTo(expectedTime, 5);
 
           // gifts: 0.40 * N + 0.35 * J + 0.25 * El
           const gifts = result.items.find((item) => item.key === "gifts");
-          const expectedGifts = Math.min(100, (0.40 * flags.N + 0.35 * flags.J + 0.25 * flags.El) * 100);
+          const expectedGifts = Math.min(
+            100,
+            (0.4 * flags.N + 0.35 * flags.J + 0.25 * flags.El) * 100
+          );
           expect(gifts?.score).toBeCloseTo(expectedGifts, 5);
 
           // service: 0.40 * J + 0.35 * Tm + 0.25 * R
           const service = result.items.find((item) => item.key === "service");
-          const expectedService = Math.min(100, (0.40 * flags.J + 0.35 * flags.Tm + 0.25 * flags.R) * 100);
+          const expectedService = Math.min(
+            100,
+            (0.4 * flags.J + 0.35 * flags.Tm + 0.25 * flags.R) * 100
+          );
           expect(service?.score).toBeCloseTo(expectedService, 5);
 
           // touch: 0.55 * E + 0.25 * C + 0.20 * Pl
           const touch = result.items.find((item) => item.key === "touch");
-          const expectedTouch = Math.min(100, (0.55 * flags.E + 0.25 * flags.C + 0.20 * flags.Pl) * 100);
+          const expectedTouch = Math.min(
+            100,
+            (0.55 * flags.E + 0.25 * flags.C + 0.2 * flags.Pl) * 100
+          );
           expect(touch?.score).toBeCloseTo(expectedTouch, 5);
         });
       });

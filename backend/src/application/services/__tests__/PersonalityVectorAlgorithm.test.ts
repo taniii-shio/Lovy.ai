@@ -1,5 +1,5 @@
 import { getFlags } from "../common/TypeFlags";
-import { calcPersonalityVector } from "../PersonalityVectorAlgorithm";
+import { calcPersonalityVector } from "../PersonalityVectorService";
 import { MBTI_TYPES } from "../../../domain/valueObjects/MBTIType";
 import { LOVE_TYPES } from "../../../domain/valueObjects/LoveType";
 
@@ -167,7 +167,8 @@ describe("PersonalityVectorAlgorithm", () => {
     it("should successfully calculate personality vector for all 256 combinations", () => {
       let successCount = 0;
       let failureCount = 0;
-      const failures: Array<{ mbti: string; loveType: string; error: string }> = [];
+      const failures: Array<{ mbti: string; loveType: string; error: string }> =
+        [];
 
       // Test all 16 MBTI × 16 LoveType = 256 combinations
       MBTI_TYPES.forEach((mbti) => {
@@ -206,13 +207,18 @@ describe("PersonalityVectorAlgorithm", () => {
             });
 
             // Validate top3 is sorted by score (descending)
-            expect(result.top3[0].score).toBeGreaterThanOrEqual(result.top3[1].score);
-            expect(result.top3[1].score).toBeGreaterThanOrEqual(result.top3[2].score);
+            expect(result.top3[0].score).toBeGreaterThanOrEqual(
+              result.top3[1].score
+            );
+            expect(result.top3[1].score).toBeGreaterThanOrEqual(
+              result.top3[2].score
+            );
 
             // Validate top3 items are from allAxes
             result.top3.forEach((topItem) => {
               const found = result.allAxes.find(
-                (axis) => axis.key === topItem.key && axis.score === topItem.score
+                (axis) =>
+                  axis.key === topItem.key && axis.score === topItem.score
               );
               expect(found).toBeDefined();
             });
@@ -356,13 +362,19 @@ describe("PersonalityVectorAlgorithm", () => {
           const result = calcPersonalityVector(flags);
 
           // Create a signature for this top3 combination
-          const top3Keys = result.top3.map((item) => item.key).sort().join(",");
+          const top3Keys = result.top3
+            .map((item) => item.key)
+            .sort()
+            .join(",");
           top3Combinations.add(top3Keys);
         });
       });
 
       console.log(`Unique top3 combinations: ${top3Combinations.size}`);
-      console.log("Sample combinations:", Array.from(top3Combinations).slice(0, 10));
+      console.log(
+        "Sample combinations:",
+        Array.from(top3Combinations).slice(0, 10)
+      );
 
       // Should have multiple different top3 combinations (not all the same)
       expect(top3Combinations.size).toBeGreaterThan(1);

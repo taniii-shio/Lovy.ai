@@ -1,4 +1,4 @@
-// =============== ② 性格ベクトル（プレゼンテーション層） ===============
+// =============== ② 性格ベクトル ===============
 
 import { TypeFlags } from "./common/TypeFlags";
 import { toS5 } from "./common/ScoreBuckets";
@@ -32,7 +32,7 @@ export function calcPersonalityVector(flags: TypeFlags): PersonalityAxis {
   const scores = calculatePersonalityScores(flags);
 
   // スコアをテキスト付きのアイテムに変換
-  const axes: PersonalityVectorItem[] = scores.allAxes.map(axisScore => {
+  const axes: PersonalityVectorItem[] = scores.allAxes.map((axisScore) => {
     const level = toS5(axisScore.score);
     return {
       key: axisScore.key,
@@ -43,7 +43,7 @@ export function calcPersonalityVector(flags: TypeFlags): PersonalityAxis {
     };
   });
 
-  const top3: PersonalityVectorItem[] = scores.top3.map(axisScore => {
+  const top3: PersonalityVectorItem[] = scores.top3.map((axisScore) => {
     const level = toS5(axisScore.score);
     return {
       key: axisScore.key,

@@ -17,14 +17,14 @@ import {
   validateDiagnosisResult,
 } from "../src/domain/entities/DiagnosisResult";
 import { getFlags } from "../src/application/services/common/TypeFlags";
-import { buildAttractivenessResult } from "../src/application/services/PopularityAlgorithm";
-import { calcPersonalityVector } from "../src/application/services/PersonalityVectorAlgorithm";
+import { buildAttractivenessResult } from "../src/application/services/PopularityService";
+import { calcPersonalityVector } from "../src/application/services/PersonalityVectorService";
 import {
   buildCompatibilityResult,
   calcCompatScore,
-} from "../src/application/services/CompatibilityAlgorithm";
-import { calcLoveLanguages } from "../src/application/services/LoveLanguageAlgorithm";
-import { calcLifeAllocation } from "../src/application/services/LifeAllocationAlgorithm";
+} from "../src/application/services/CompatibilityService";
+import { calcLoveLanguages } from "../src/application/services/LoveLanguageService";
+import { calcLifeAllocation } from "../src/application/services/LifeAllocationService";
 
 /**
  * コマンドライン引数を解析
