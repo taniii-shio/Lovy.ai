@@ -12,33 +12,37 @@ provider:
   environment:
     STAGE: ${self:provider.stage}
     NODE_ENV: ${self:provider.stage}
-  logs:
-    restApi: true
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - logs:CreateLogGroup
-            - logs:CreateLogStream
-            - logs:PutLogEvents
-          Resource: "*"
+    ALLOWED_ORIGIN: ${self:custom.allowedOrigins.${self:provider.stage}}
   apiGateway:
-    restApiId: !Ref ApiGatewayRestApi
-    shouldStartNameWithService: true
+    metrics: true
+    usagePlan:
+      quota:
+        limit: 100
+        period: DAY
+      throttle:
+        rateLimit: 5
+        burstLimit: 10
 
 plugins:
   - serverless-plugin-typescript
 
+custom:
+  allowedOrigins:
+    dev: "*"
+    prod: "https://yourdomain.com"  # 本番環境のフロントエンドドメインに変更してください
+  allowCredentials:
+    dev: false
+    prod: true
+
 functions:
-  diagnosis:
-    handler: src/interface/http/DiagnosisHandler.handler
+  hello:
+    handler: src/presentation/handlers/hello.handler
     events:
       - http:
-          path: /api/v1/diagnosis
-          method: post
+          path: /api/v1/hello
+          method: get
           cors:
-            origin: '*'
+            origin: ${self:custom.allowedOrigins.${self:provider.stage}}
             headers:
               - Content-Type
               - X-Amz-Date
@@ -46,10 +50,24 @@ functions:
               - X-Api-Key
               - X-Amz-Security-Token
               - X-Amz-User-Agent
-            allowCredentials: false
-          throttling:
-            maxRequestsPerSecond: 10
-            maxConcurrentRequests: 5
+            allowCredentials: ${self:custom.allowCredentials.${self:provider.stage}}
+
+  diagnosis:
+    handler: src/presentation/handlers/diagnosis.handler
+    events:
+      - http:
+          path: /api/v1/diagnosis
+          method: post
+          cors:
+            origin: ${self:custom.allowedOrigins.${self:provider.stage}}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: ${self:custom.allowCredentials.${self:provider.stage}}
 
 package:
   individually: true

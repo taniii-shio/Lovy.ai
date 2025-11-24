@@ -57,8 +57,7 @@ Lovy.ai は、MBTI（16 タイプ）と Love Type 16（16 タイプ）を組み�
 │   │   ├── domain/       # ドメイン層（エンティティ、値オブジェクト）
 │   │   ├── application/  # アプリケーション層（ユースケース、DTO）
 │   │   ├── infrastructure/ # インフラ層（静的データ、アルゴリズム）
-│   │   ├── interface/    # インターフェース層（HTTPハンドラー）
-│   │   └── shared/       # 共通ユーティリティ
+│   │   ├── presentation/    # プレゼンテーション層（HTTPハンドラー）
 │   ├── serverless.yml
 │   ├── package.json
 │   └── tsconfig.json
