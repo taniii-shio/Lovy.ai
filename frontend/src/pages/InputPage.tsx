@@ -1,30 +1,38 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import type { MBTIType, LoveType } from '../types';
-import { MBTI_TYPES, LOVE_TYPES } from '../types';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import type { MBTIType, LoveType } from "../types";
+import {
+  MBTI_TYPES,
+  LOVE_TYPES,
+  MBTI_LABELS,
+  LOVE_TYPE_LABELS,
+} from "../types";
 
 export default function InputPage() {
   const navigate = useNavigate();
-  const [nickname, setNickname] = useState('');
-  const [mbti, setMbti] = useState<MBTIType | ''>('');
-  const [loveType, setLoveType] = useState<LoveType | ''>('');
+  const [nickname, setNickname] = useState("");
+  const [mbti, setMbti] = useState<MBTIType | "">("");
+  const [loveType, setLoveType] = useState<LoveType | "">("");
 
   const handleSubmit = () => {
     if (!nickname || !mbti || !loveType) {
-      alert('すべての項目を入力してください');
+      alert("すべての項目を入力してください");
       return;
     }
 
     // Store data in sessionStorage
-    sessionStorage.setItem('userProfile', JSON.stringify({ nickname, mbti, loveType }));
-    navigate('/analyzing');
+    sessionStorage.setItem(
+      "userProfile",
+      JSON.stringify({ nickname, mbti, loveType })
+    );
+    navigate("/analyzing");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-6">
       <div className="max-w-md w-full">
         <h1 className="text-3xl font-bold text-gray-800 text-center mb-12">
-          Profile Input
+          プロフィール入力
         </h1>
 
         <div className="space-y-8">
@@ -37,7 +45,7 @@ export default function InputPage() {
               type="text"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
-              placeholder="例: ろびーちゃん"
+              placeholder="例: らびーちゃん"
               className="w-full px-6 py-4 bg-white rounded-2xl border-2 border-transparent focus:border-purple-400 focus:outline-none text-gray-700 placeholder-gray-400 transition-all"
             />
           </div>
@@ -52,13 +60,15 @@ export default function InputPage() {
                 value={mbti}
                 onChange={(e) => setMbti(e.target.value as MBTIType)}
                 className={`w-full px-6 py-4 bg-white rounded-2xl border-2 appearance-none cursor-pointer transition-all ${
-                  mbti ? 'border-purple-400 text-gray-800' : 'border-transparent text-gray-400'
+                  mbti
+                    ? "border-purple-400 text-gray-800"
+                    : "border-transparent text-gray-400"
                 } focus:border-purple-400 focus:outline-none`}
               >
                 <option value="">選択してください</option>
                 {MBTI_TYPES.map((type) => (
                   <option key={type} value={type}>
-                    {type}
+                    {type} ({MBTI_LABELS[type]})
                   </option>
                 ))}
               </select>
@@ -88,13 +98,15 @@ export default function InputPage() {
                 value={loveType}
                 onChange={(e) => setLoveType(e.target.value as LoveType)}
                 className={`w-full px-6 py-4 bg-white rounded-2xl border-2 appearance-none cursor-pointer transition-all ${
-                  loveType ? 'border-purple-400 text-gray-800' : 'border-transparent text-gray-400'
+                  loveType
+                    ? "border-purple-400 text-gray-800"
+                    : "border-transparent text-gray-400"
                 } focus:border-purple-400 focus:outline-none`}
               >
                 <option value="">選択してください</option>
                 {LOVE_TYPES.map((type) => (
                   <option key={type} value={type}>
-                    {type}
+                    {LOVE_TYPE_LABELS[type]} ({type})
                   </option>
                 ))}
               </select>
@@ -125,7 +137,7 @@ export default function InputPage() {
 
         {/* Back Link */}
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/")}
           className="w-full mt-6 text-gray-500 hover:text-gray-700 transition-colors"
         >
           ← 戻る
