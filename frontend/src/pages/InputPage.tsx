@@ -53,7 +53,7 @@ export default function InputPage() {
           {/* MBTI Select */}
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
-              MBTI
+              16タイプ性格診断
             </label>
             <div className="relative">
               <select
@@ -91,7 +91,7 @@ export default function InputPage() {
           {/* Love Type Select */}
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">
-              LOVE TYPE
+              ラブタイプ診断
             </label>
             <div className="relative">
               <select
