@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { MBTIType, LoveType, DiagnosisResult } from "../types";
+import PageBackground from "../components/PageBackground";
 
 export default function AnalyzingPage() {
   const navigate = useNavigate();
@@ -58,39 +59,52 @@ export default function AnalyzingPage() {
   }, [navigate]);
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-6">
+    <div className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-6">
+      <PageBackground />
+
       <div className="max-w-lg w-full">
+        {/* Text */}
+        <h1 className="text-3xl font-bold text-gray-800 text-center mb-12">
+          診断中...
+        </h1>
+
         {/* Loading Animation */}
         <div className="flex justify-center mb-8">
-          <div className="relative">
-            {/* Animated bubbles */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-24 h-24 bg-gradient-lovy rounded-full opacity-60 animate-ping"></div>
-            </div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 bg-gradient-lovy rounded-full opacity-80 animate-pulse"></div>
-            </div>
-            <div className="relative w-32 h-32 flex items-center justify-center">
-              <div className="w-12 h-12 bg-pink-400 rounded-full"></div>
-              <div className="absolute top-4 right-8 w-8 h-8 bg-purple-400 rounded-full"></div>
-              <div className="absolute bottom-8 right-12 w-6 h-6 bg-purple-300 rounded-full"></div>
-            </div>
+          <div className="relative w-24 h-24">
+            <img
+              src="/logo.svg"
+              alt="Loading"
+              className="w-30 h-30"
+              style={{
+                animation: "gentle-rotate 1s ease-in-out infinite",
+              }}
+            />
           </div>
         </div>
 
-        {/* Text */}
-        <h1 className="text-3xl font-bold text-gray-800 text-center mb-3">
-          Analyzing...
-        </h1>
-        <p className="text-center text-gray-600 mb-2">
+        <style>{`
+          @keyframes gentle-rotate {
+            0%, 100% {
+              transform: rotate(0deg) scale(1);
+              opacity: 0.7;
+            }
+            50% {
+              transform: rotate(5deg) scale(1.05);
+              opacity: 1;
+            }
+          }
+        `}</style>
+
+        {/* Caption */}
+        <p className="text-center text-gray-700 text-lg mb-2">
           あなたの成分を抽出中...
         </p>
-        <p className="text-center text-gray-600 mb-12">
-          恋の反応式を計算しています...
+        <p className="text-center text-gray-700 text-lg mb-12">
+          恋と人生の反応式を計算しています...
         </p>
 
         {/* Video Ad Area */}
-        <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl border-2 border-dashed border-gray-300 p-12 text-center">
+        <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl border-2 border-dashed border-gray-300 p-24 text-center">
           <p className="text-gray-400 font-semibold text-lg mb-2">
             Video AD Area
           </p>

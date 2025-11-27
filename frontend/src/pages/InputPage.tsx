@@ -7,6 +7,7 @@ import {
   MBTI_LABELS,
   LOVE_TYPE_LABELS,
 } from "../types";
+import PageBackground from "../components/PageBackground";
 
 export default function InputPage() {
   const navigate = useNavigate();
@@ -29,7 +30,9 @@ export default function InputPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-6">
+    <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-6">
+      <PageBackground />
+
       <div className="max-w-md w-full">
         <h1 className="text-3xl font-bold text-gray-800 text-center mb-12">
           プロフィール入力
