@@ -17,11 +17,13 @@ export default function ResultPage() {
   const [animateCompatibility, setAnimateCompatibility] = useState(false);
   const [slotPercentage, setSlotPercentage] = useState(0);
   const [titleCharCount, setTitleCharCount] = useState(0);
+  const [showFooter, setShowFooter] = useState(true);
   const scoresSectionRef = useRef<HTMLDivElement>(null);
   const loveLanguageSectionRef = useRef<HTMLDivElement>(null);
   const lifeAllocationSectionRef = useRef<HTMLDivElement>(null);
   const personalitySectionRef = useRef<HTMLDivElement>(null);
   const compatibilitySectionRef = useRef<HTMLDivElement>(null);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     const resultData = sessionStorage.getItem("diagnosisResult");
@@ -79,6 +81,37 @@ export default function ResultPage() {
 
     return () => clearInterval(interval);
   }, [result]);
+
+  // Scroll direction detection for footer
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const scrollDiff = currentScrollY - lastScrollY.current;
+
+      // 最上部付近では常に表示
+      if (currentScrollY < 50) {
+        setShowFooter(true);
+      } else {
+        // 一定以上スクロールした場合のみ反応（感度調整）
+        if (Math.abs(scrollDiff) > 5) {
+          // 下にスクロール → 非表示、上にスクロール → 表示
+          if (scrollDiff > 0) {
+            setShowFooter(false);
+          } else {
+            setShowFooter(true);
+          }
+        }
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     const scoresObserver = new IntersectionObserver(
@@ -528,7 +561,7 @@ export default function ResultPage() {
             </div>
 
             <p
-              className="text-gray-700 text-sm mb-6 leading-relaxed font-medium animate-fade-in-up"
+              className="text-gray-700 text-base mb-6 leading-relaxed font-medium animate-fade-in-up"
               style={{ animationDelay: "0.8s" }}
             >
               {attractiveness.texts.summary}
@@ -637,7 +670,7 @@ export default function ResultPage() {
                         {trait.label}
                       </span>
                     </div>
-                    <p className="text-gray-700 text-xs leading-relaxed pl-13 font-medium">
+                    <p className="text-gray-700 text-sm leading-relaxed pl-13 font-medium">
                       {trait.text}
                     </p>
                   </div>
@@ -700,7 +733,7 @@ export default function ResultPage() {
                             <h4 className="text-base font-bold text-gray-800 mb-1">
                               {match.partner.mbti} - {match.partner.loveType}
                             </h4>
-                            <p className="text-gray-700 text-xs leading-relaxed font-medium">
+                            <p className="text-gray-700 text-sm leading-relaxed font-medium">
                               {match.description}
                             </p>
                           </div>
@@ -763,7 +796,7 @@ export default function ResultPage() {
                               }}
                             />
                           </div>
-                          <p className="text-gray-700 text-xs leading-relaxed pl-13 mb-4 font-medium">
+                          <p className="text-gray-700 text-sm leading-relaxed pl-13 mb-4 font-medium">
                             {item.text}
                           </p>
                           {index <
@@ -782,7 +815,7 @@ export default function ResultPage() {
                       <h4 className="text-gray-800 text-sm font-bold mb-2">
                         まとめ
                       </h4>
-                      <p className="text-gray-700 text-xs leading-relaxed font-medium">
+                      <p className="text-gray-700 text-sm leading-relaxed font-medium">
                         {result.results.loveLanguage.summaryText}
                       </p>
                     </div>
@@ -892,13 +925,6 @@ export default function ResultPage() {
                       const sortedItems = [
                         ...result.results.lifeAllocation.items,
                       ].sort((a, b) => b.percent - a.percent);
-                      const iconMap: Record<string, string> = {
-                        friends: "👥",
-                        partner: "💑",
-                        hobbies: "🎨",
-                        family: "👨‍👩‍👧‍👦",
-                        work: "💼",
-                      };
                       let currentAngle = 0;
                       const centerX = 140;
                       const centerY = 140;
@@ -977,7 +1003,7 @@ export default function ResultPage() {
                                 {Math.round(item.percent)}%
                               </span>
                             </div>
-                            <p className="text-gray-700 text-xs leading-relaxed font-medium">
+                            <p className="text-gray-700 text-sm leading-relaxed font-medium">
                               {item.text}
                             </p>
                           </div>
@@ -993,7 +1019,7 @@ export default function ResultPage() {
                       <h4 className="text-gray-800 text-sm font-bold mb-2">
                         まとめ
                       </h4>
-                      <p className="text-gray-700 text-xs leading-relaxed font-medium">
+                      <p className="text-gray-700 text-sm leading-relaxed font-medium">
                         {result.results.lifeAllocation.summaryText}
                       </p>
                     </div>
@@ -1004,31 +1030,52 @@ export default function ResultPage() {
           )}
 
         {/* Action Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white/95 via-white/80 to-transparent backdrop-blur-sm pb-6 pt-8">
-          <div className="max-w-2xl mx-auto px-6 space-y-3">
-            <button
-              onClick={handleShare}
-              className="w-full py-4 px-8 text-xl font-bold text-white bg-gradient-lovy rounded-full shadow-2xl hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
-            >
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
-              </svg>
-              診断結果をシェアする！
-            </button>
-
-            <div className="text-center space-y-2">
-              <p className="text-sm text-gray-800 font-bold">
-                {result.nickname}さんの診断結果
-              </p>
-              <div className="flex items-center justify-center gap-3 text-sm text-gray-700">
-                <span className="bg-purple-100/80 px-3 py-1 rounded-full font-semibold">
-                  {result.mbti}
-                </span>
-                <span className="text-gray-500">×</span>
-                <span className="bg-pink-100/80 px-3 py-1 rounded-full font-semibold">
-                  {result.loveType}
-                </span>
+        <div
+          className={`fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/85 to-transparent pb-6 pt-8 transition-transform duration-500 ease-in-out ${
+            showFooter ? "translate-y-0" : "translate-y-full"
+          }`}
+        >
+          <div className="max-w-2xl mx-auto px-6">
+            <div className="flex items-center gap-4">
+              {/* 診断結果表示 */}
+              <div className="flex flex-col items-start flex-shrink-0 max-w-[160px]">
+                <p className="text-xs text-gray-800 font-bold mb-1 w-full flex items-center">
+                  <span className="truncate flex-shrink">
+                    {result.nickname}
+                  </span>
+                  <span className="flex-shrink-0">さんの診断結果</span>
+                </p>
+                <div className="flex items-center gap-2 text-sm text-gray-700 flex-shrink-0">
+                  <div className="border-2 border-purple-300 px-2 py-0.5 rounded-lg">
+                    <p className="text-xs font-bold text-purple-700">
+                      {result.mbti}
+                    </p>
+                  </div>
+                  <span className="text-gray-300 text-xs font-light">×</span>
+                  <div className="border-2 border-pink-300 px-2 py-0.5 rounded-lg">
+                    <p className="text-xs font-bold text-pink-700">
+                      {result.loveType}
+                    </p>
+                  </div>
+                </div>
               </div>
+
+              {/* シェアボタン */}
+              <button
+                onClick={handleShare}
+                className="flex-1 py-3 px-6 text-base font-bold text-white bg-gradient-lovy rounded-full shadow-2xl hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <svg
+                  className="w-5 h-5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+                </svg>
+                <div className="flex flex-col items-center leading-tight">
+                  <div>結果をシェア！</div>
+                </div>
+              </button>
             </div>
           </div>
         </div>
