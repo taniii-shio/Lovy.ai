@@ -305,8 +305,8 @@ export default function ResultPage() {
         {[...Array(6)].map((_, i) => {
           const sizes = [60, 70, 55, 65, 58, 72];
           const leftPositions = [15, 35, 55, 75, 25, 65];
-          const durations = [10, 12, 11, 13, 10.5, 12.5];
-          const delays = [0, 2, 4, 6, 8, 10];
+          const durations = [7.5, 9, 8, 9.5, 8, 9];
+          const delays = [0, 1.5, 3, 4.5, 6, 7.5];
           const opacities = [0.26, 0.28, 0.24, 0.3, 0.25, 0.27];
           const swayAmount = [35, -40, 30, -35, 32, -38];
 
