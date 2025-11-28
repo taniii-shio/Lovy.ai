@@ -1,10 +1,6 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
-interface FooterProps {
-  withBottomMargin?: boolean;
-}
-
-export default function Footer({ withBottomMargin = false }: FooterProps) {
+export default function Footer() {
   return (
     <footer className="bg-white border-t border-gray-200 mt-auto">
       <div className="max-w-7xl mx-auto py-8 px-6">
@@ -32,7 +28,6 @@ export default function Footer({ withBottomMargin = false }: FooterProps) {
           © 2025 Lovy.ai All rights reserved.
         </div>
       </div>
-      {withBottomMargin && <div className="h-28 bg-white"></div>}
     </footer>
   );
 }

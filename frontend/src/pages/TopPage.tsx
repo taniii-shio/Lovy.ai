@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import PageBackground from '../components/PageBackground';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import PageBackground from "../components/PageBackground";
 
 export default function TopPage() {
   const navigate = useNavigate();
@@ -25,11 +25,7 @@ export default function TopPage() {
 
         {/* Title */}
         <div className="flex justify-center mb-4">
-          <img
-            src="/typo.svg"
-            alt="Lovy.ai"
-            className="h-16"
-          />
+          <img src="/typo.svg" alt="Lovy.ai" className="h-16" />
         </div>
 
         {/* Subtitle */}
@@ -37,12 +33,12 @@ export default function TopPage() {
           AIが解き明かす、
         </p>
         <p className="text-center text-gray-700 text-lg mb-12">
-          あなたの恋と人生の化学式。
+          あなたの恋と人生の反応式。
         </p>
 
         {/* Start Button */}
         <button
-          onClick={() => navigate('/input')}
+          onClick={() => navigate("/input")}
           className="w-full py-4 px-8 text-xl font-bold text-white bg-gradient-lovy rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
         >
           診断をはじめる

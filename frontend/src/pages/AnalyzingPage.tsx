@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { MBTIType, LoveType, DiagnosisResult } from "../types";
 import PageBackground from "../components/PageBackground";
+import AdArea from "../components/AdArea";
 
 export default function AnalyzingPage() {
   const navigate = useNavigate();
+  const [isAnalysisComplete, setIsAnalysisComplete] = useState(false);
 
   useEffect(() => {
     const analyze = async () => {
@@ -47,7 +49,8 @@ export default function AnalyzingPage() {
         // Wait a minimum time for UX
         await new Promise((resolve) => setTimeout(resolve, 3000));
 
-        navigate("/result");
+        // Mark analysis as complete
+        setIsAnalysisComplete(true);
       } catch (error) {
         console.error("Analysis error:", error);
         alert("分析中にエラーが発生しました。もう一度お試しください。");
@@ -65,7 +68,7 @@ export default function AnalyzingPage() {
       <div className="max-w-lg w-full">
         {/* Text */}
         <h1 className="text-3xl font-bold text-gray-800 text-center mb-12">
-          診断中...
+          {isAnalysisComplete ? "分析完了！" : "分析中..."}
         </h1>
 
         {/* Loading Animation */}
@@ -76,7 +79,9 @@ export default function AnalyzingPage() {
               alt="Loading"
               className="w-30 h-30"
               style={{
-                animation: "gentle-rotate 1s ease-in-out infinite",
+                animation: isAnalysisComplete
+                  ? "none"
+                  : "gentle-rotate 1s ease-in-out infinite",
               }}
             />
           </div>
@@ -96,20 +101,28 @@ export default function AnalyzingPage() {
         `}</style>
 
         {/* Caption */}
-        <p className="text-center text-gray-700 text-lg mb-2">
-          あなたの成分を抽出中...
-        </p>
-        <p className="text-center text-gray-700 text-lg mb-12">
-          恋と人生の反応式を計算しています...
-        </p>
+        {!isAnalysisComplete ? (
+          <p className="text-center text-gray-700 text-lg mb-12">
+            あなたの成分を抽出中...
+          </p>
+        ) : (
+          <p className="text-center text-gray-700 text-lg mb-12">
+            恋と人生の反応式が解明されました！
+          </p>
+        )}
 
         {/* Video Ad Area */}
-        <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl border-2 border-dashed border-gray-300 p-24 text-center">
-          <p className="text-gray-400 font-semibold text-lg mb-2">
-            Video AD Area
-          </p>
-          <p className="text-gray-400 text-sm">ここに動画広告が表示されます</p>
-        </div>
+        <AdArea className="mb-12" />
+
+        {/* Result Button */}
+        {isAnalysisComplete && (
+          <button
+            onClick={() => navigate("/result")}
+            className="w-full py-4 px-8 text-xl font-bold text-white bg-gradient-lovy rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+          >
+            結果を見る
+          </button>
+        )}
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import type { DiagnosisResult } from "../types";
 import html2canvas from "html2canvas";
 import PageBackground from "../components/PageBackground";
+import AdArea from "../components/AdArea";
 
 export default function ResultPage() {
   const navigate = useNavigate();
@@ -355,9 +356,9 @@ export default function ResultPage() {
       `}</style>
 
       {/* Main Content */}
-      <div className="max-w-2xl mx-auto p-6 pb-32 space-y-8">
-        {/* Banner Area Mock */}
-        <div className="bg-gradient-to-r from-purple-100/40 via-pink-100/40 to-purple-100/40 backdrop-blur-sm rounded-lg p-6 shadow-lg border-2 border-dashed border-purple-300/60 mb-12"></div>
+      <div className="max-w-2xl mx-auto p-6 space-y-8">
+        {/* Banner Area */}
+        <AdArea variant="banner" />
 
         {/* Title */}
         <div className="text-center">
@@ -909,9 +910,12 @@ export default function ResultPage() {
             </div>
           )}
 
+        {/* Bottom Banner Area */}
+        <AdArea variant="banner" />
+
         {/* Action Buttons */}
         <div
-          className={`fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/85 to-transparent pb-6 pt-8 transition-transform duration-500 ease-in-out ${
+          className={`fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/85 to-transparent pt-8 transition-transform duration-500 ease-in-out ${
             showFooter ? "translate-y-0" : "translate-y-full"
           }`}
         >

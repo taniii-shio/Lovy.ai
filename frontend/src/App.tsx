@@ -1,9 +1,4 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import TopPage from "./pages/TopPage";
 import InputPage from "./pages/InputPage";
 import AnalyzingPage from "./pages/AnalyzingPage";
@@ -15,9 +10,6 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 
 function AppContent() {
-  const location = useLocation();
-  const isResultPage = location.pathname === "/result";
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -32,7 +24,7 @@ function AppContent() {
           <Route path="/contact" element={<ContactPage />} />
         </Routes>
       </div>
-      <Footer withBottomMargin={isResultPage} />
+      <Footer />
     </div>
   );
 }
