@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import type { DiagnosisResult } from "../types";
 import html2canvas from "html2canvas";
-import PageBackground from "../components/PageBackground";
 import AdArea from "../components/AdArea";
 
 export default function ResultPage() {
@@ -289,8 +288,6 @@ export default function ResultPage() {
 
   return (
     <div className="relative min-h-screen">
-      <PageBackground />
-
       {/* CSS Animation */}
       <style>{`
         @keyframes fade-in-up {

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { MBTIType, LoveType, DiagnosisResult } from "../types";
-import PageBackground from "../components/PageBackground";
 import AdArea from "../components/AdArea";
 
 export default function AnalyzingPage() {
@@ -63,8 +62,6 @@ export default function AnalyzingPage() {
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-6">
-      <PageBackground />
-
       <div className="max-w-lg w-full">
         {/* Text */}
         <h1 className="text-3xl font-bold text-gray-800 text-center mb-12">

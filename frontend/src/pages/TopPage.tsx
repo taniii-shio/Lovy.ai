@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import PageBackground from "../components/PageBackground";
 
 export default function TopPage() {
   const navigate = useNavigate();
@@ -11,8 +10,6 @@ export default function TopPage() {
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-6">
-      <PageBackground />
-
       <div className="max-w-md w-full">
         {/* Logo Icon */}
         <div className="flex justify-center mb-2">
