@@ -15,7 +15,6 @@ export default function AdArea({
         <p className="text-gray-400 font-semibold text-lg mb-2">
           Banner AD Area
         </p>
-        {/* <p className="text-gray-400 text-sm">ここにバナー広告が表示されます</p> */}
       </div>
     );
   }
@@ -25,7 +24,6 @@ export default function AdArea({
       className={`bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl border-2 border-dashed border-gray-300 p-24 text-center ${className}`}
     >
       <p className="text-gray-400 font-semibold text-lg mb-2">Video AD Area</p>
-      {/* <p className="text-gray-400 text-sm">ここに動画広告が表示されます</p> */}
     </div>
   );
 }
