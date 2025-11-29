@@ -1,71 +1,54 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { MBTIType, LoveType, DiagnosisResult } from "../types";
+import { useDiagnosis } from "../hooks/useDiagnosis";
+import { userProfileStorage, diagnosisResultStorage } from "../utils/storage";
 import AdArea from "../components/AdArea";
+import Button from "../components/common/Button";
 
-export default function AnalyzingPage() {
+export default function Processing() {
   const navigate = useNavigate();
-  const [isAnalysisComplete, setIsAnalysisComplete] = useState(false);
+  const { isAnalyzing, isComplete, error, runDiagnosis } = useDiagnosis(3000);
+  const [hasExistingResult, setHasExistingResult] = useState(false);
 
   useEffect(() => {
-    const analyze = async () => {
-      // Get user profile from sessionStorage
-      const profileData = sessionStorage.getItem("userProfile");
-      if (!profileData) {
-        navigate("/diagnosis/start");
-        return;
-      }
+    // Check if diagnosis result already exists (e.g., from browser back)
+    const existingResult = diagnosisResultStorage.get();
 
-      const { nickname, mbti, loveType } = JSON.parse(profileData) as {
-        nickname: string;
-        mbti: MBTIType;
-        loveType: LoveType;
-      };
+    if (existingResult) {
+      // Result already exists, skip diagnosis and show complete state
+      setHasExistingResult(true);
+      return;
+    }
 
-      try {
-        // Call API
-        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-        const response = await fetch(apiUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ mbti, loveType }),
-        });
+    // Get user profile from session storage
+    const profile = userProfileStorage.get();
 
-        if (!response.ok) {
-          throw new Error("分析に失敗しました");
-        }
+    if (!profile) {
+      // No profile found, redirect to start page
+      navigate("/diagnosis/start");
+      return;
+    }
 
-        const result: DiagnosisResult = await response.json();
+    // Run diagnosis
+    runDiagnosis(profile);
+  }, [navigate, runDiagnosis]);
 
-        // Store result with nickname
-        sessionStorage.setItem(
-          "diagnosisResult",
-          JSON.stringify({ ...result, nickname })
-        );
+  // Handle error - redirect back to start
+  useEffect(() => {
+    if (error) {
+      alert(error);
+      navigate("/diagnosis/start");
+    }
+  }, [error, navigate]);
 
-        // Wait a minimum time for UX
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-
-        // Mark analysis as complete
-        setIsAnalysisComplete(true);
-      } catch (error) {
-        console.error("Analysis error:", error);
-        alert("分析中にエラーが発生しました。もう一度お試しください。");
-        navigate("/diagnosis/start");
-      }
-    };
-
-    analyze();
-  }, [navigate]);
+  const showComplete = isComplete || hasExistingResult;
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-6">
       <div className="max-w-lg w-full">
         {/* Text */}
         <h1 className="text-3xl font-bold text-gray-800 text-center mb-12">
-          {isAnalysisComplete ? "分析完了！" : "分析中..."}
+          {showComplete ? "分析完了！" : "分析中..."}
         </h1>
 
         {/* Loading Animation */}
@@ -76,7 +59,7 @@ export default function AnalyzingPage() {
               alt="Loading"
               className="w-30 h-30"
               style={{
-                animation: isAnalysisComplete
+                animation: showComplete
                   ? "none"
                   : "gentle-rotate 1s ease-in-out infinite",
               }}
@@ -98,7 +81,7 @@ export default function AnalyzingPage() {
         `}</style>
 
         {/* Caption */}
-        {!isAnalysisComplete ? (
+        {!showComplete ? (
           <p className="text-center text-gray-700 text-lg mb-12">
             あなたの成分を抽出中...
           </p>
@@ -112,13 +95,14 @@ export default function AnalyzingPage() {
         <AdArea className="mb-12" />
 
         {/* Result Button */}
-        {isAnalysisComplete && (
-          <button
+        {showComplete && (
+          <Button
             onClick={() => navigate("/diagnosis/results")}
-            className="w-full py-4 px-8 text-xl font-bold text-white bg-gradient-lovy rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+            fullWidth
+            disabled={isAnalyzing}
           >
             結果を見る
-          </button>
+          </Button>
         )}
       </div>
     </div>

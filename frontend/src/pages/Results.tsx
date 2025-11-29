@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import type { DiagnosisResult } from "../types";
 import html2canvas from "html2canvas";
 import AdArea from "../components/AdArea";
+import { diagnosisResultStorage } from "../utils/storage";
 
-export default function ResultPage() {
+export default function Results() {
   const navigate = useNavigate();
   const [result, setResult] = useState<
     (DiagnosisResult & { nickname: string }) | null
@@ -27,13 +28,13 @@ export default function ResultPage() {
   const lastScrollY = useRef(0);
 
   useEffect(() => {
-    const resultData = sessionStorage.getItem("diagnosisResult");
+    const resultData = diagnosisResultStorage.get();
     if (!resultData) {
       navigate("/diagnosis/start");
       return;
     }
 
-    setResult(JSON.parse(resultData));
+    setResult(resultData);
   }, [navigate]);
 
   // Title animation effect

@@ -7,8 +7,10 @@ import {
   MBTI_LABELS,
   LOVE_TYPE_LABELS,
 } from "../types";
+import { userProfileStorage } from "../utils/storage";
+import Button from "../components/common/Button";
 
-export default function InputPage() {
+export default function Start() {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState("");
   const [mbti, setMbti] = useState<MBTIType | "">("");
@@ -20,11 +22,13 @@ export default function InputPage() {
       return;
     }
 
-    // Store data in sessionStorage
-    sessionStorage.setItem(
-      "userProfile",
-      JSON.stringify({ nickname, mbti, loveType })
-    );
+    // Store data in session storage using typed helper
+    userProfileStorage.save({
+      nickname,
+      mbti,
+      loveType,
+    });
+
     navigate("/diagnosis/processing");
   };
 
@@ -128,20 +132,21 @@ export default function InputPage() {
         </div>
 
         {/* Submit Button */}
-        <button
-          onClick={handleSubmit}
-          className="w-full mt-12 py-4 px-8 text-xl font-bold text-white bg-gradient-lovy rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-        >
-          分析する
-        </button>
+        <div className="mt-12">
+          <Button onClick={handleSubmit} fullWidth>
+            分析する
+          </Button>
+        </div>
 
         {/* Back Link */}
-        <button
+        <Button
+          variant="ghost"
           onClick={() => navigate("/")}
-          className="w-full mt-6 text-gray-500 hover:text-gray-700 transition-colors"
+          fullWidth
+          className="mt-6"
         >
           ← 戻る
-        </button>
+        </Button>
       </div>
     </div>
   );

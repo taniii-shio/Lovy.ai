@@ -1,26 +1,26 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { useScrollToTop } from "../hooks/useScrollToTop";
+import Button from "../components/common/Button";
+import GradientText from "../components/common/GradientText";
 
-export default function PrivacyPage() {
+export default function Privacy() {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  useScrollToTop();
 
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-4xl mx-auto">
-        <button
-          onClick={() => navigate('/')}
-          className="mb-6 text-gray-600 hover:text-gray-800"
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/")}
+          className="mb-6"
         >
           ← トップに戻る
-        </button>
+        </Button>
 
-        <h1 className="text-4xl font-bold mb-8 bg-gradient-lovy bg-clip-text text-transparent">
+        <GradientText as="h1" className="text-4xl font-bold mb-8">
           プライバシーポリシー
-        </h1>
+        </GradientText>
 
         <div className="bg-white rounded-lg shadow-lg p-8">
           <p className="text-gray-700">
