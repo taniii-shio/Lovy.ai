@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import TopPage from "./pages/TopPage";
-import InputPage from "./pages/InputPage";
-import AnalyzingPage from "./pages/AnalyzingPage";
-import ResultPage from "./pages/ResultPage";
-import TermsPage from "./pages/TermsPage";
-import PrivacyPage from "./pages/PrivacyPage";
-import ContactPage from "./pages/ContactPage";
+import Top from "./pages/Top";
+import Start from "./pages/Start";
+import Processing from "./pages/Processing";
+import Results from "./pages/Results";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Contact from "./pages/Contact";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import PageBackground from "./components/PageBackground";
@@ -17,13 +17,13 @@ function AppContent() {
       <Header />
       <div className="flex-grow">
         <Routes>
-          <Route path="/" element={<TopPage />} />
-          <Route path="/input" element={<InputPage />} />
-          <Route path="/analyzing" element={<AnalyzingPage />} />
-          <Route path="/result" element={<ResultPage />} />
-          <Route path="/terms" element={<TermsPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/" element={<Top />} />
+          <Route path="/diagnosis/start" element={<Start />} />
+          <Route path="/diagnosis/processing" element={<Processing />} />
+          <Route path="/diagnosis/results" element={<Results />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </div>
       <Footer />

@@ -25,7 +25,7 @@ export default function InputPage() {
       "userProfile",
       JSON.stringify({ nickname, mbti, loveType })
     );
-    navigate("/analyzing");
+    navigate("/diagnosis/processing");
   };
 
   return (

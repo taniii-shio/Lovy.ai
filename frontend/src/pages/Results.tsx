@@ -29,7 +29,7 @@ export default function ResultPage() {
   useEffect(() => {
     const resultData = sessionStorage.getItem("diagnosisResult");
     if (!resultData) {
-      navigate("/input");
+      navigate("/diagnosis/start");
       return;
     }
 

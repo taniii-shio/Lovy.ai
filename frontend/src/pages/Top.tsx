@@ -35,7 +35,7 @@ export default function TopPage() {
 
         {/* Start Button */}
         <button
-          onClick={() => navigate("/input")}
+          onClick={() => navigate("/diagnosis/start")}
           className="w-full py-4 px-8 text-xl font-bold text-white bg-gradient-lovy rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
         >
           診断をはじめる

@@ -12,7 +12,7 @@ export default function AnalyzingPage() {
       // Get user profile from sessionStorage
       const profileData = sessionStorage.getItem("userProfile");
       if (!profileData) {
-        navigate("/input");
+        navigate("/diagnosis/start");
         return;
       }
 
@@ -53,7 +53,7 @@ export default function AnalyzingPage() {
       } catch (error) {
         console.error("Analysis error:", error);
         alert("分析中にエラーが発生しました。もう一度お試しください。");
-        navigate("/input");
+        navigate("/diagnosis/start");
       }
     };
 
@@ -114,7 +114,7 @@ export default function AnalyzingPage() {
         {/* Result Button */}
         {isAnalysisComplete && (
           <button
-            onClick={() => navigate("/result")}
+            onClick={() => navigate("/diagnosis/results")}
             className="w-full py-4 px-8 text-xl font-bold text-white bg-gradient-lovy rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
           >
             結果を見る
