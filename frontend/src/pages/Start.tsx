@@ -7,8 +7,9 @@ import {
   MBTI_LABELS,
   LOVE_TYPE_LABELS,
 } from "../types";
-import { userProfileStorage } from "../utils/storage";
+import { userProfileStorage, diagnosisResultStorage } from "../utils/storage";
 import Button from "../components/common/Button";
+import AdArea from "../components/AdArea";
 
 export default function Start() {
   const navigate = useNavigate();
@@ -22,6 +23,9 @@ export default function Start() {
       return;
     }
 
+    // Clear previous diagnosis result to ensure fresh analysis
+    diagnosisResultStorage.remove();
+
     // Store data in session storage using typed helper
     userProfileStorage.save({
       nickname,
@@ -33,8 +37,9 @@ export default function Start() {
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-6">
-      <div className="max-w-md w-full">
+    <div className="relative min-h-screen flex flex-col">
+      <div className="h-screen flex items-center justify-center p-6">
+        <div className="max-w-md w-full">
         <h1 className="text-3xl font-bold text-gray-800 text-center mb-12">
           プロフィール入力
         </h1>
@@ -147,6 +152,12 @@ export default function Start() {
         >
           ← 戻る
         </Button>
+        </div>
+      </div>
+
+      {/* Bottom Banner Area */}
+      <div className="pb-6 px-6">
+        <AdArea variant="banner" />
       </div>
     </div>
   );

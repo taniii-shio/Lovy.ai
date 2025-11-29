@@ -12,13 +12,18 @@ const API_CONFIG = {
  * API Error class
  */
 export class ApiError extends Error {
+  status?: number;
+  data?: unknown;
+
   constructor(
     message: string,
-    public status?: number,
-    public data?: unknown
+    status?: number,
+    data?: unknown
   ) {
     super(message);
     this.name = "ApiError";
+    this.status = status;
+    this.data = data;
   }
 }
 
