@@ -1,94 +1,102 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 
 interface Bubble {
   id: number;
   size: number;
   left: number;
   duration: number;
-  delay: number;
   swayAmount: number;
   opacity: number;
   colorType: number;
+  createdAt: number;
 }
 
 export default function PageBackground(): React.JSX.Element {
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
   const bubbleIdRef = useRef<number>(0);
 
-  useEffect(() => {
-    // 初期バブルを生成（少なめに）
-    const initialBubbles: Bubble[] = Array.from({ length: 8 }, (_, i) =>
-      createBubble(i)
-    );
-    setBubbles(initialBubbles);
-    bubbleIdRef.current = 8;
-
-    // ゆっくり新しいバブルを追加（2秒ごとに1個）
-    const interval = setInterval(() => {
-      setBubbles((prev) => {
-        // 古いバブルを削除（最大4個まで）
-        const filtered = prev.length > 4 ? prev.slice(-12) : prev;
-        // 新しいバブルを1個追加
-        const newBubble = createBubble(bubbleIdRef.current);
-        bubbleIdRef.current += 1;
-        return [...filtered, newBubble];
-      });
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  function createBubble(id: number): Bubble {
+  const createBubble = useCallback((): Bubble => {
     const size = Math.random() * 50 + 30; // 30-80px
     const left = Math.random() * 90 + 5; // 5-95%
-    const duration = Math.random() * 6 + 10;
-    const delay = Math.random() * 1;
-    const swayAmount = (Math.random() - 0.5) * 40;
+    const duration = Math.random() * 8 + 12; // 12-20秒
+    const swayAmount = (Math.random() - 0.5) * 80; // 左右の揺れを大きく
     const opacity = Math.random() * 0.2 + 0.15;
-    const colorType = Math.floor(Math.random() * 4);
+    const colorType = Math.floor(Math.random() * 3);
 
-    return {
-      id,
+    const bubble: Bubble = {
+      id: bubbleIdRef.current,
       size,
       left,
       duration,
-      delay,
       swayAmount,
       opacity,
       colorType,
+      createdAt: Date.now(),
     };
-  }
+
+    bubbleIdRef.current += 1;
+    return bubble;
+  }, []);
+
+  useEffect(() => {
+    // 初期バブルを生成
+    const initialBubbles: Bubble[] = Array.from({ length: 2 }, () =>
+      createBubble()
+    );
+    setBubbles(initialBubbles);
+
+    // 新しいバブルを追加（3秒ごと）
+    const addInterval = setInterval(() => {
+      setBubbles((prev) => [...prev, createBubble()]);
+    }, 3000);
+
+    // 古いバブルをクリーンアップ（アニメーション完了後のみ削除）
+    const cleanupInterval = setInterval(() => {
+      const now = Date.now();
+      setBubbles((prev) =>
+        prev.filter((bubble) => {
+          const maxLifetime = (bubble.duration + 2) * 1000;
+          return now - bubble.createdAt < maxLifetime;
+        })
+      );
+    }, 5000);
+
+    return () => {
+      clearInterval(addInterval);
+      clearInterval(cleanupInterval);
+    };
+  }, [createBubble]);
 
   const getGradient = (type: number): string => {
     const gradients = [
-      "linear-gradient(135deg, rgba(139, 92, 246, 0.7), rgba(236, 72, 153, 0.7))",
-      "linear-gradient(135deg, rgba(236, 72, 153, 0.7), rgba(244, 114, 182, 0.7))",
-      "linear-gradient(135deg, rgba(168, 85, 247, 0.7), rgba(219, 39, 119, 0.7))",
-      "linear-gradient(135deg, rgba(251, 146, 60, 0.6), rgba(236, 72, 153, 0.6))",
+      "linear-gradient(135deg, rgba(139, 92, 246, 0.6), rgba(236, 72, 153, 0.6))",
+      "linear-gradient(135deg, rgba(236, 72, 153, 0.6), rgba(244, 114, 182, 0.6))",
+      "linear-gradient(135deg, rgba(168, 85, 247, 0.6), rgba(219, 39, 119, 0.6))",
     ];
     return gradients[type];
   };
 
-  // 小さな気泡用の固定値（数を減らす）
+  // 小さな白い気泡用の固定値（速い動作）
   const tinyBubbles = useRef(
-    [...Array(6)].map((_, i) => ({
+    [...Array(8)].map((_, i) => ({
       id: i,
-      size: 5 + (i % 4) * 2,
-      left: (i * 12 + 6) % 100,
-      duration: 8 + (i % 3) * 2,
-      delay: i * 1.5,
+      size: 6 + (i % 4) * 3, // 6-15px
+      left: (i * 12 + 5) % 95,
+      duration: 6 + (i % 3) * 1.5,
+      delay: i * 1.2,
+      sway: (i % 2 === 0 ? 1 : -1) * (20 + (i % 4) * 10), // 左右の揺れ
     }))
   ).current;
 
-  // 中サイズバブル用の固定値（数を減らす）
+  // 中サイズバブル用の固定値
   const midBubbles = useRef(
     [...Array(3)].map((_, i) => ({
       id: i,
-      size: 25 + (i % 4) * 8,
-      left: 15 + i * 17,
-      duration: 10 + (i % 3) * 3,
-      delay: i * 2,
-      sway: (i % 2 === 0 ? 1 : -1) * (15 + (i % 3) * 8),
+      size: 28 + (i % 3) * 10,
+      left: 20 + i * 25,
+      duration: 12 + (i % 3) * 4,
+      delay: i * 3,
+      sway: (i % 2 === 0 ? 1 : -1) * (25 + (i % 3) * 15), // 左右の揺れを大きく
     }))
   ).current;
 
@@ -99,25 +107,16 @@ export default function PageBackground(): React.JSX.Element {
         className="fixed inset-0 pointer-events-none overflow-hidden"
         style={{ zIndex: -1 }}
       >
-        {/* Gradient Background - より温かみのある色 */}
+        {/* Gradient Background */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(253, 224, 235, 0.9) 0%, rgba(252, 211, 230, 0.95) 30%, rgba(251, 194, 220, 0.9) 60%, rgba(250, 180, 210, 0.85) 100%)",
+              "linear-gradient(180deg, rgba(243, 232, 255, 0.85) 0%, rgba(252, 231, 243, 0.85) 50%, rgba(243, 232, 255, 0.85) 100%)",
           }}
         />
 
-        {/* 底部のグロー効果（熱源イメージ） */}
-        <div
-          className="absolute bottom-0 left-0 right-0 h-32"
-          style={{
-            background:
-              "linear-gradient(to top, rgba(236, 72, 153, 0.3), transparent)",
-          }}
-        />
-
-        {/* メインバブル - infinite ループ */}
+        {/* メインバブル */}
         {bubbles.map((bubble) => (
           <div
             key={bubble.id}
@@ -129,14 +128,9 @@ export default function PageBackground(): React.JSX.Element {
                 left: `${bubble.left}%`,
                 bottom: "-80px",
                 background: getGradient(bubble.colorType),
-                animation: `boil-rise ${bubble.duration}s cubic-bezier(0.25, 0.1, 0.25, 1) infinite`,
-                animationDelay: `${bubble.delay}s`,
+                animation: `boil-rise ${bubble.duration}s cubic-bezier(0.25, 0.1, 0.25, 1) forwards`,
                 filter: `blur(${bubble.size > 50 ? 2.5 : 1.5}px)`,
-                boxShadow: `0 0 ${
-                  bubble.size / 3
-                }px rgba(236, 72, 153, 0.4), inset 0 0 ${
-                  bubble.size / 4
-                }px rgba(255, 255, 255, 0.3)`,
+                boxShadow: `0 0 ${bubble.size / 3}px rgba(236, 72, 153, 0.3)`,
                 "--sway-amount": `${bubble.swayAmount}px`,
                 "--base-opacity": `${bubble.opacity}`,
               } as React.CSSProperties & {
@@ -147,25 +141,28 @@ export default function PageBackground(): React.JSX.Element {
           />
         ))}
 
-        {/* 小さな気泡 - infinite ループ */}
+        {/* 小さな白い気泡 - 速い動作 */}
         {tinyBubbles.map((bubble) => (
           <div
             key={`tiny-${bubble.id}`}
             className="absolute rounded-full"
-            style={{
-              width: `${bubble.size}px`,
-              height: `${bubble.size}px`,
-              left: `${bubble.left}%`,
-              bottom: "-20px",
-              background: "rgba(255, 255, 255, 0.6)",
-              animation: `tiny-rise ${bubble.duration}s cubic-bezier(0.4, 0, 0.2, 1) infinite`,
-              animationDelay: `${bubble.delay}s`,
-              boxShadow: "0 0 4px rgba(255, 255, 255, 0.5)",
-            }}
+            style={
+              {
+                width: `${bubble.size}px`,
+                height: `${bubble.size}px`,
+                left: `${bubble.left}%`,
+                bottom: "-20px",
+                background: "rgba(255, 255, 255, 0.6)",
+                animation: `tiny-rise ${bubble.duration}s cubic-bezier(0.4, 0, 0.2, 1) infinite`,
+                animationDelay: `${bubble.delay}s`,
+                boxShadow: "0 0 6px rgba(255, 255, 255, 0.5)",
+                "--sway-amount": `${bubble.sway}px`,
+              } as React.CSSProperties & { "--sway-amount": string }
+            }
           />
         ))}
 
-        {/* 中サイズの連続バブル - infinite ループ */}
+        {/* 中サイズの連続バブル */}
         {midBubbles.map((bubble) => (
           <div
             key={`mid-${bubble.id}`}
@@ -176,11 +173,11 @@ export default function PageBackground(): React.JSX.Element {
                 height: `${bubble.size}px`,
                 left: `${bubble.left}%`,
                 bottom: "-50px",
-                background: getGradient(bubble.id % 4),
+                background: getGradient(bubble.id % 3),
                 animation: `boil-rise-loop ${bubble.duration}s cubic-bezier(0.4, 0, 0.2, 1) infinite`,
                 animationDelay: `${bubble.delay}s`,
                 filter: "blur(1.5px)",
-                boxShadow: `0 0 15px rgba(236, 72, 153, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.2)`,
+                boxShadow: "0 0 20px rgba(236, 72, 153, 0.3)",
                 "--sway-amount": `${bubble.sway}px`,
               } as React.CSSProperties & { "--sway-amount": string }
             }
@@ -188,38 +185,42 @@ export default function PageBackground(): React.JSX.Element {
         ))}
       </div>
 
-      {/* CSS Animation - すべて infinite でループ */}
+      {/* CSS Animation */}
       <style>{`
         @keyframes boil-rise {
-          0%, 100% {
+          0% {
             transform: translateY(0) translateX(0) scale(1);
             opacity: 0;
           }
-          5% {
+          3% {
             opacity: var(--base-opacity, 0.25);
           }
-          15% {
-            transform: translateY(-15vh) translateX(calc(var(--sway-amount) * 0.4)) scale(1.03);
+          12% {
+            transform: translateY(-12vh) translateX(calc(var(--sway-amount) * 0.3)) scale(1.02);
             opacity: var(--base-opacity, 0.25);
           }
-          35% {
-            transform: translateY(-35vh) translateX(var(--sway-amount)) scale(1.06);
-            opacity: calc(var(--base-opacity, 0.25) * 0.95);
+          25% {
+            transform: translateY(-25vh) translateX(calc(var(--sway-amount) * -0.5)) scale(1.04);
+            opacity: var(--base-opacity, 0.25);
+          }
+          40% {
+            transform: translateY(-40vh) translateX(calc(var(--sway-amount) * 0.7)) scale(1.06);
+            opacity: calc(var(--base-opacity, 0.25) * 0.9);
           }
           55% {
-            transform: translateY(-55vh) translateX(calc(var(--sway-amount) * 0.2)) scale(1.08);
-            opacity: calc(var(--base-opacity, 0.25) * 0.8);
+            transform: translateY(-55vh) translateX(calc(var(--sway-amount) * -0.4)) scale(1.08);
+            opacity: calc(var(--base-opacity, 0.25) * 0.75);
           }
-          75% {
-            transform: translateY(-75vh) translateX(calc(var(--sway-amount) * -0.3)) scale(1.1);
+          70% {
+            transform: translateY(-70vh) translateX(calc(var(--sway-amount) * 0.5)) scale(1.1);
             opacity: calc(var(--base-opacity, 0.25) * 0.5);
           }
-          90% {
-            transform: translateY(-90vh) translateX(0) scale(1.12);
+          85% {
+            transform: translateY(-85vh) translateX(calc(var(--sway-amount) * -0.2)) scale(1.12);
             opacity: calc(var(--base-opacity, 0.25) * 0.2);
           }
-          97% {
-            transform: translateY(-100vh) translateX(0) scale(1.14);
+          100% {
+            transform: translateY(-105vh) translateX(0) scale(1.14);
             opacity: 0;
           }
         }
@@ -229,53 +230,73 @@ export default function PageBackground(): React.JSX.Element {
             transform: translateY(0) translateX(0) scale(1);
             opacity: 0;
           }
-          5% {
+          3% {
             opacity: 0.22;
           }
-          20% {
-            transform: translateY(-20vh) translateX(calc(var(--sway-amount) * 0.5)) scale(1.03);
+          15% {
+            transform: translateY(-15vh) translateX(calc(var(--sway-amount) * 0.4)) scale(1.02);
             opacity: 0.22;
           }
-          40% {
-            transform: translateY(-40vh) translateX(var(--sway-amount)) scale(1.05);
-            opacity: 0.18;
+          30% {
+            transform: translateY(-30vh) translateX(calc(var(--sway-amount) * -0.6)) scale(1.04);
+            opacity: 0.2;
+          }
+          45% {
+            transform: translateY(-45vh) translateX(calc(var(--sway-amount) * 0.7)) scale(1.06);
+            opacity: 0.16;
           }
           60% {
-            transform: translateY(-60vh) translateX(calc(var(--sway-amount) * 0.2)) scale(1.07);
+            transform: translateY(-60vh) translateX(calc(var(--sway-amount) * -0.5)) scale(1.07);
             opacity: 0.12;
           }
-          80% {
-            transform: translateY(-80vh) translateX(calc(var(--sway-amount) * -0.2)) scale(1.09);
-            opacity: 0.06;
+          75% {
+            transform: translateY(-75vh) translateX(calc(var(--sway-amount) * 0.3)) scale(1.08);
+            opacity: 0.07;
           }
-          95% {
-            transform: translateY(-98vh) translateX(0) scale(1.1);
+          90% {
+            transform: translateY(-90vh) translateX(calc(var(--sway-amount) * -0.1)) scale(1.09);
+            opacity: 0.02;
+          }
+          97% {
+            transform: translateY(-105vh) translateX(0) scale(1.1);
             opacity: 0;
           }
         }
 
         @keyframes tiny-rise {
           0%, 100% {
-            transform: translateY(0) scale(1);
+            transform: translateY(0) translateX(0) scale(1);
             opacity: 0;
           }
           5% {
-            opacity: 0.45;
+            opacity: 0.6;
           }
-          25% {
-            transform: translateY(-25vh) scale(1.05);
+          15% {
+            transform: translateY(-15vh) translateX(calc(var(--sway-amount) * 0.5)) scale(1.05);
+            opacity: 0.6;
+          }
+          30% {
+            transform: translateY(-30vh) translateX(calc(var(--sway-amount) * -0.7)) scale(1.08);
+            opacity: 0.5;
+          }
+          45% {
+            transform: translateY(-45vh) translateX(calc(var(--sway-amount) * 0.8)) scale(1.1);
             opacity: 0.4;
           }
-          50% {
-            transform: translateY(-50vh) scale(1.1);
-            opacity: 0.3;
+          60% {
+            transform: translateY(-60vh) translateX(calc(var(--sway-amount) * -0.6)) scale(1.08);
+            opacity: 0.28;
           }
           75% {
-            transform: translateY(-75vh) scale(1.05);
+            transform: translateY(-75vh) translateX(calc(var(--sway-amount) * 0.4)) scale(1.05);
             opacity: 0.15;
           }
-          92% {
-            transform: translateY(-95vh) scale(1.0);
+          90% {
+            transform: translateY(-90vh) translateX(calc(var(--sway-amount) * -0.2)) scale(1.02);
+            opacity: 0.05;
+          }
+          97% {
+            transform: translateY(-105vh) translateX(0) scale(1.0);
             opacity: 0;
           }
         }

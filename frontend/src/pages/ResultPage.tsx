@@ -915,7 +915,7 @@ export default function ResultPage() {
 
         {/* Action Buttons */}
         <div
-          className={`fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/85 to-transparent pt-8 transition-transform duration-500 ease-in-out ${
+          className={`fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/85 to-transparent pb-6 pt-8 transition-transform duration-500 ease-in-out ${
             showFooter ? "translate-y-0" : "translate-y-full"
           }`}
         >
