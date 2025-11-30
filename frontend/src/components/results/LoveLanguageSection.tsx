@@ -1,3 +1,4 @@
+import React from "react";
 import { useScrollAnimation } from "../../hooks/useScrollAnimation";
 
 interface LoveLanguageItem {
@@ -12,7 +13,7 @@ interface LoveLanguageSectionProps {
   summaryText?: string;
 }
 
-export default function LoveLanguageSection({
+const LoveLanguageSection = React.memo(function LoveLanguageSection({
   items,
   summaryText,
 }: LoveLanguageSectionProps) {
@@ -90,4 +91,6 @@ export default function LoveLanguageSection({
       </div>
     </div>
   );
-}
+});
+
+export default LoveLanguageSection;

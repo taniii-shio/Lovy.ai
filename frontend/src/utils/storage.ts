@@ -13,10 +13,9 @@ export interface StoredUserProfile {
   loveType: LoveType;
 }
 
-// Diagnosis Result Storage Type (with nickname)
-export interface StoredDiagnosisResult extends DiagnosisResult {
-  nickname: string;
-}
+// Diagnosis Result Storage Type
+// Note: Nickname is stored separately in USER_PROFILE, not duplicated here
+export type StoredDiagnosisResult = DiagnosisResult;
 
 /**
  * Generic Session Storage wrapper with type safety

@@ -9,7 +9,7 @@ export interface GradientTextProps {
 /**
  * Text component with gradient styling
  */
-export default function GradientText({
+const GradientText = React.memo(function GradientText({
   children,
   className = "",
   as: Component = "span",
@@ -20,4 +20,6 @@ export default function GradientText({
     .join(" ");
 
   return <Component className={combinedClassName}>{children}</Component>;
-}
+});
+
+export default GradientText;

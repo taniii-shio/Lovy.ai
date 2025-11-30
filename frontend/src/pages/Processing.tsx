@@ -100,6 +100,7 @@ export default function Processing() {
             onClick={() => navigate("/diagnosis/results")}
             fullWidth
             disabled={isAnalyzing}
+            aria-label="診断結果を表示"
           >
             結果を見る
           </Button>

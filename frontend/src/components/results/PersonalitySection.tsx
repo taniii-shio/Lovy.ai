@@ -1,3 +1,4 @@
+import React from "react";
 import { useScrollAnimation } from "../../hooks/useScrollAnimation";
 
 interface PersonalityTrait {
@@ -9,7 +10,7 @@ interface PersonalitySectionProps {
   traits: PersonalityTrait[];
 }
 
-export default function PersonalitySection({ traits }: PersonalitySectionProps) {
+const PersonalitySection = React.memo(function PersonalitySection({ traits }: PersonalitySectionProps) {
   const { ref, isVisible } = useScrollAnimation();
   const icons = ["🎭", "🌟", "💫"];
 
@@ -49,4 +50,6 @@ export default function PersonalitySection({ traits }: PersonalitySectionProps) 
       </div>
     </div>
   );
-}
+});
+
+export default PersonalitySection;

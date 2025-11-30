@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import type { DiagnosisResult } from "../types";
 import AdArea from "../components/advertising/AdArea";
-import { diagnosisResultStorage } from "../utils/storage";
+import { diagnosisResultStorage, userProfileStorage } from "../utils/storage";
 import { useShareImage } from "../hooks/useShareImage";
 import ScoreSection from "../components/results/ScoreSection";
 import PersonalitySection from "../components/results/PersonalitySection";
@@ -12,9 +12,8 @@ import LifeAllocationChart from "../components/results/LifeAllocationChart";
 
 export default function Results() {
   const navigate = useNavigate();
-  const [result, setResult] = useState<
-    (DiagnosisResult & { nickname: string }) | null
-  >(null);
+  const [result, setResult] = useState<DiagnosisResult | null>(null);
+  const [nickname, setNickname] = useState<string>("");
   const [slotPercentage, setSlotPercentage] = useState(0);
   const [titleCharCount, setTitleCharCount] = useState(0);
   const [showFooter, setShowFooter] = useState(true);
@@ -30,19 +29,22 @@ export default function Results() {
 
   useEffect(() => {
     const resultData = diagnosisResultStorage.get();
-    if (!resultData) {
+    const profileData = userProfileStorage.get();
+
+    if (!resultData || !profileData) {
       navigate("/diagnosis/start");
       return;
     }
 
     setResult(resultData);
+    setNickname(profileData.nickname);
   }, [navigate]);
 
   // Title animation effect
   useEffect(() => {
-    if (!result) return;
+    if (!result || !nickname) return;
 
-    const fullTitle = `${result.nickname}のLovyな人生`;
+    const fullTitle = `${nickname}のLovyな人生`;
     const duration = 50; // milliseconds per character
     let currentChar = 0;
 
@@ -56,7 +58,7 @@ export default function Results() {
     }, duration);
 
     return () => clearInterval(interval);
-  }, [result]);
+  }, [result, nickname]);
 
   // Slot animation effect
   useEffect(() => {
@@ -116,8 +118,8 @@ export default function Results() {
   };
 
   const handleSaveImage = () => {
-    if (result) {
-      saveImage(result.nickname);
+    if (nickname) {
+      saveImage(nickname);
     }
   };
 
@@ -213,7 +215,7 @@ export default function Results() {
         <div className="text-center">
           <div className="text-2xl font-bold text-gray-800 mb-3">
             {(() => {
-              const fullTitle = `${result.nickname}のLovyな人生`;
+              const fullTitle = `${nickname}のLovyな人生`;
               const displayedText = fullTitle.slice(0, titleCharCount);
               const parts = displayedText.split("の");
 
@@ -338,7 +340,7 @@ export default function Results() {
               <div className="flex flex-col items-start flex-shrink-0 max-w-[160px]">
                 <p className="text-xs text-gray-800 font-bold mb-1 w-full flex items-center">
                   <span className="truncate flex-shrink">
-                    {result.nickname}
+                    {nickname}
                   </span>
                   <span className="flex-shrink-0">さんの診断結果</span>
                 </p>
@@ -361,11 +363,13 @@ export default function Results() {
               <button
                 onClick={handleShare}
                 className="flex-1 py-3 px-6 text-base font-bold text-white bg-gradient-lovy rounded-full shadow-2xl hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+                aria-label="診断結果を画像としてシェア"
               >
                 <svg
                   className="w-5 h-5 flex-shrink-0"
                   fill="currentColor"
                   viewBox="0 0 20 20"
+                  aria-hidden="true"
                 >
                   <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
                 </svg>
@@ -379,16 +383,21 @@ export default function Results() {
 
         {/* Share Modal */}
         {showShareModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="share-modal-title"
+          >
             <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 max-w-md w-full border border-white/50 shadow-2xl">
-              <h3 className="text-2xl font-bold text-gray-800 text-center mb-6">
+              <h3 id="share-modal-title" className="text-2xl font-bold text-gray-800 text-center mb-6">
                 シェア画像が完成！
               </h3>
 
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 mb-6">
                 <img
                   src={shareImageUrl}
-                  alt="Share"
+                  alt="診断結果のシェア画像"
                   className="w-full rounded-lg shadow-lg"
                 />
               </div>
@@ -397,12 +406,14 @@ export default function Results() {
                 <button
                   onClick={() => setShowShareModal(false)}
                   className="flex-1 py-3 px-6 text-gray-600 bg-gray-100 rounded-2xl font-semibold hover:bg-gray-200 transition-colors"
+                  aria-label="モーダルを閉じる"
                 >
                   閉じる
                 </button>
                 <button
                   onClick={handleSaveImage}
                   className="flex-1 py-3 px-6 text-white bg-gradient-lovy rounded-2xl font-semibold hover:shadow-lg transition-all"
+                  aria-label="画像をダウンロード"
                 >
                   画像保存
                 </button>

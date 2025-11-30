@@ -106,6 +106,8 @@ export default function PageBackground(): React.JSX.Element {
       <div
         className="fixed inset-0 pointer-events-none overflow-hidden"
         style={{ zIndex: -1 }}
+        aria-hidden="true"
+        role="presentation"
       >
         {/* Gradient Background */}
         <div

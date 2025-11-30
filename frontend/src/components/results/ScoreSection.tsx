@@ -1,3 +1,4 @@
+import React from "react";
 import { useScrollAnimation } from "../../hooks/useScrollAnimation";
 
 interface ScoreSectionProps {
@@ -8,7 +9,7 @@ interface ScoreSectionProps {
   };
 }
 
-export default function ScoreSection({ scores }: ScoreSectionProps) {
+const ScoreSection = React.memo(function ScoreSection({ scores }: ScoreSectionProps) {
   const { ref, isVisible } = useScrollAnimation();
 
   return (
@@ -77,4 +78,6 @@ export default function ScoreSection({ scores }: ScoreSectionProps) {
       </div>
     </div>
   );
-}
+});
+
+export default ScoreSection;

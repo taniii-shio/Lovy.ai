@@ -1,3 +1,4 @@
+import React from "react";
 import { useScrollAnimation } from "../../hooks/useScrollAnimation";
 
 interface CompatibilityMatch {
@@ -12,7 +13,7 @@ interface CompatibilitySectionProps {
   matches: CompatibilityMatch[];
 }
 
-export default function CompatibilitySection({
+const CompatibilitySection = React.memo(function CompatibilitySection({
   matches,
 }: CompatibilitySectionProps) {
   const { ref, isVisible } = useScrollAnimation();
@@ -72,4 +73,6 @@ export default function CompatibilitySection({
       </div>
     </div>
   );
-}
+});
+
+export default CompatibilitySection;

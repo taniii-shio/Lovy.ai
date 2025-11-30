@@ -4,7 +4,6 @@ import { diagnosisApi, ApiError } from "../services/api";
 import {
   userProfileStorage,
   diagnosisResultStorage,
-  type StoredDiagnosisResult,
 } from "../utils/storage";
 
 export interface UseDiagnosisReturn {
@@ -53,12 +52,8 @@ export function useDiagnosis(minWaitTime = 3000): UseDiagnosisReturn {
           new Promise((resolve) => setTimeout(resolve, minWaitTime)),
         ]);
 
-        // Save diagnosis result with nickname
-        const resultWithNickname: StoredDiagnosisResult = {
-          ...result,
-          nickname: params.nickname,
-        };
-        diagnosisResultStorage.save(resultWithNickname);
+        // Save diagnosis result (nickname is already saved in userProfile)
+        diagnosisResultStorage.save(result);
 
         setIsComplete(true);
       } catch (err) {

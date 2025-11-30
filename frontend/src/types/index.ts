@@ -64,10 +64,27 @@ export const LOVE_TYPE_LABELS: Record<LoveType, string> = {
   'FAPE': '最後の恋人',
 };
 
-export interface UserProfile {
+// User Profile Input (allows empty strings during input)
+export interface UserProfileInput {
   nickname: string;
   mbti: MBTIType | '';
   loveType: LoveType | '';
+}
+
+// User Profile (validated, no empty strings)
+export interface UserProfile {
+  nickname: string;
+  mbti: MBTIType;
+  loveType: LoveType;
+}
+
+// Type guard to validate UserProfile
+export function isValidUserProfile(input: UserProfileInput): input is UserProfile {
+  return (
+    input.nickname.trim() !== '' &&
+    input.mbti !== '' &&
+    input.loveType !== ''
+  );
 }
 
 // Backend API Response Types

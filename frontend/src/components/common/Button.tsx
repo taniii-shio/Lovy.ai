@@ -28,7 +28,7 @@ const sizeStyles: Record<ButtonSize, string> = {
 /**
  * Reusable Button component with consistent styling
  */
-export default function Button({
+const Button = React.memo(function Button({
   variant = "primary",
   size = "lg",
   fullWidth = false,
@@ -60,4 +60,6 @@ export default function Button({
       {children}
     </button>
   );
-}
+});
+
+export default Button;

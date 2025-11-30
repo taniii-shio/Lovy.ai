@@ -1,3 +1,4 @@
+import React from "react";
 import { useScrollAnimation } from "../../hooks/useScrollAnimation";
 
 interface LifeAllocationItem {
@@ -12,7 +13,7 @@ interface LifeAllocationChartProps {
   summaryText?: string;
 }
 
-export default function LifeAllocationChart({
+const LifeAllocationChart = React.memo(function LifeAllocationChart({
   items,
   summaryText,
 }: LifeAllocationChartProps) {
@@ -203,4 +204,6 @@ export default function LifeAllocationChart({
       </div>
     </div>
   );
-}
+});
+
+export default LifeAllocationChart;
