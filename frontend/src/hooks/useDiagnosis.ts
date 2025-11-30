@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import type { MBTIType, LoveType, DiagnosisResult } from "../types";
+import type { MBTIType, LoveType } from "../types";
 import { diagnosisApi, ApiError } from "../services/api";
 import {
   userProfileStorage,

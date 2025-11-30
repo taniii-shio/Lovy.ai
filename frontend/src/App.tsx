@@ -6,9 +6,9 @@ import Results from "./pages/Results";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import PageBackground from "./components/PageBackground";
+import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
+import PageBackground from "./components/layout/PageBackground";
 
 function AppContent() {
   return (

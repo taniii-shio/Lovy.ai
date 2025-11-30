@@ -9,7 +9,7 @@ import {
 } from "../types";
 import { userProfileStorage, diagnosisResultStorage } from "../utils/storage";
 import Button from "../components/common/Button";
-import AdArea from "../components/AdArea";
+import AdArea from "../components/advertising/AdArea";
 
 export default function Start() {
   const navigate = useNavigate();

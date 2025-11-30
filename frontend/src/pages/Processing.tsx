@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDiagnosis } from "../hooks/useDiagnosis";
 import { userProfileStorage, diagnosisResultStorage } from "../utils/storage";
-import AdArea from "../components/AdArea";
+import AdArea from "../components/advertising/AdArea";
 import Button from "../components/common/Button";
 
 export default function Processing() {

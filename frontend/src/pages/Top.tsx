@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useScrollToTop } from "../hooks/useScrollToTop";
 import Button from "../components/common/Button";
-import AdArea from "../components/AdArea";
+import AdArea from "../components/advertising/AdArea";
 
 export default function Top() {
   const navigate = useNavigate();
