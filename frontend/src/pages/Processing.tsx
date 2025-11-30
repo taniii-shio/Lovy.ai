@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useScrollToTop } from "../hooks/useScrollToTop";
 import { useDiagnosis } from "../hooks/useDiagnosis";
 import { userProfileStorage, diagnosisResultStorage } from "../utils/storage";
 import AdArea from "../components/advertising/AdArea";
@@ -7,6 +8,8 @@ import Button from "../components/common/Button";
 
 export default function Processing() {
   const navigate = useNavigate();
+  useScrollToTop();
+
   const { isAnalyzing, isComplete, error, runDiagnosis } = useDiagnosis(3000);
   const [hasExistingResult, setHasExistingResult] = useState(false);
 
@@ -91,9 +94,6 @@ export default function Processing() {
           </p>
         )}
 
-        {/* Video Ad Area */}
-        <AdArea className="mb-12" />
-
         {/* Result Button */}
         {showComplete && (
           <Button
@@ -101,10 +101,14 @@ export default function Processing() {
             fullWidth
             disabled={isAnalyzing}
             aria-label="診断結果を表示"
+            className="mb-12"
           >
             結果を見る
           </Button>
         )}
+
+        {/* Video Ad Area */}
+        <AdArea className="mb-12" />
       </div>
     </div>
   );

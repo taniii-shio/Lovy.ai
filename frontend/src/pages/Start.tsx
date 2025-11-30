@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useScrollToTop } from "../hooks/useScrollToTop";
 import type { MBTIType, LoveType, UserProfileInput } from "../types";
 import { MBTI_TYPES, LOVE_TYPES, isValidUserProfile } from "../types";
 import { userProfileStorage, diagnosisResultStorage } from "../utils/storage";
@@ -10,9 +11,14 @@ import {
 } from "../utils/validation";
 import Button from "../components/common/Button";
 import AdArea from "../components/advertising/AdArea";
+import DiagnosisModal, {
+  type DiagnosisQuestion,
+} from "../components/diagnosis/DiagnosisModal";
 
 export default function Start() {
   const navigate = useNavigate();
+  useScrollToTop();
+
   const [nickname, setNickname] = useState("");
   const [mbti, setMbti] = useState<MBTIType | "">("");
   const [loveType, setLoveType] = useState<LoveType | "">("");
@@ -25,18 +31,12 @@ export default function Start() {
 
   // MBTI診断モーダルの状態管理
   const [isMbtiModalOpen, setIsMbtiModalOpen] = useState(false);
-  const [mbtiCurrentQuestion, setMbtiCurrentQuestion] = useState(0);
-  const [mbtiSelectedAnswers, setMbtiSelectedAnswers] = useState<string[]>([]);
 
   // ラブタイプ診断モーダルの状態管理
   const [isLoveTypeModalOpen, setIsLoveTypeModalOpen] = useState(false);
-  const [loveTypeCurrentQuestion, setLoveTypeCurrentQuestion] = useState(0);
-  const [loveTypeSelectedAnswers, setLoveTypeSelectedAnswers] = useState<
-    string[]
-  >([]);
 
   // MBTI診断の質問データ
-  const mbtiQuestions = [
+  const mbtiQuestions: DiagnosisQuestion[] = [
     {
       title: "【1/4】エネルギーの方向は？",
       options: [
@@ -68,7 +68,7 @@ export default function Start() {
   ];
 
   // ラブタイプ診断の質問データ
-  const loveTypeQuestions = [
+  const loveTypeQuestions: DiagnosisQuestion[] = [
     {
       title: "【1/4】恋愛の主導権は？",
       options: [
@@ -102,55 +102,27 @@ export default function Start() {
   // MBTI診断モーダルのハンドラー
   const handleOpenMbtiModal = () => {
     setIsMbtiModalOpen(true);
-    setMbtiCurrentQuestion(0);
-    setMbtiSelectedAnswers([]);
   };
 
   const handleCloseMbtiModal = () => {
     setIsMbtiModalOpen(false);
-    setMbtiCurrentQuestion(0);
-    setMbtiSelectedAnswers([]);
   };
 
-  const handleMbtiSelectAnswer = (value: string) => {
-    const newAnswers = [...mbtiSelectedAnswers, value];
-    setMbtiSelectedAnswers(newAnswers);
-
-    if (mbtiCurrentQuestion < mbtiQuestions.length - 1) {
-      // 次の質問へ
-      setMbtiCurrentQuestion(mbtiCurrentQuestion + 1);
-    } else {
-      // 全ての質問に回答済み → MBTIタイプを生成
-      const mbtiType = newAnswers.join("") as MBTIType;
-      handleMbtiChange(mbtiType);
-    }
+  const handleMbtiComplete = (result: string) => {
+    handleMbtiChange(result as MBTIType);
   };
 
   // ラブタイプ診断モーダルのハンドラー
   const handleOpenLoveTypeModal = () => {
     setIsLoveTypeModalOpen(true);
-    setLoveTypeCurrentQuestion(0);
-    setLoveTypeSelectedAnswers([]);
   };
 
   const handleCloseLoveTypeModal = () => {
     setIsLoveTypeModalOpen(false);
-    setLoveTypeCurrentQuestion(0);
-    setLoveTypeSelectedAnswers([]);
   };
 
-  const handleLoveTypeSelectAnswer = (value: string) => {
-    const newAnswers = [...loveTypeSelectedAnswers, value];
-    setLoveTypeSelectedAnswers(newAnswers);
-
-    if (loveTypeCurrentQuestion < loveTypeQuestions.length - 1) {
-      // 次の質問へ
-      setLoveTypeCurrentQuestion(loveTypeCurrentQuestion + 1);
-    } else {
-      // 全ての質問に回答済み → ラブタイプを生成
-      const loveTypeValue = newAnswers.join("") as LoveType;
-      handleLoveTypeChange(loveTypeValue);
-    }
+  const handleLoveTypeComplete = (result: string) => {
+    handleLoveTypeChange(result as LoveType);
   };
 
   const handleSubmit = () => {
@@ -406,126 +378,24 @@ export default function Start() {
       </div>
 
       {/* MBTI診断モーダル */}
-      {isMbtiModalOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50"
-          onClick={handleCloseMbtiModal}
-        >
-          <div
-            className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {mbtiSelectedAnswers.length < mbtiQuestions.length ? (
-              <>
-                {/* 質問画面 */}
-                <h2 className="text-xl font-bold text-gray-800 mb-8 text-center">
-                  {mbtiQuestions[mbtiCurrentQuestion].title}
-                </h2>
-                <div className="space-y-3">
-                  {mbtiQuestions[mbtiCurrentQuestion].options.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => handleMbtiSelectAnswer(option.value)}
-                      className="w-full px-5 py-3.5 bg-purple-50 hover:bg-purple-100 text-purple-900 rounded-2xl text-sm font-medium transition-all transform hover:scale-105 active:scale-95"
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  onClick={handleCloseMbtiModal}
-                  className="mt-8 w-full text-gray-500 hover:text-gray-700 text-xs transition-colors"
-                >
-                  キャンセル
-                </button>
-              </>
-            ) : (
-              <>
-                {/* 結果画面 */}
-                <div className="text-center">
-                  <h2 className="text-xl font-bold text-gray-800 mb-8">
-                    診断完了！
-                  </h2>
-                  <p className="text-base text-gray-600">あなたのタイプは</p>
-                  <p className="text-3xl font-bold text-purple-600 mt-1 mb-2">
-                    {mbtiSelectedAnswers.join("")}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">ですね！</p>
-                </div>
-                <button
-                  onClick={handleCloseMbtiModal}
-                  className="mt-8 w-full text-gray-500 hover:text-gray-700 text-xs transition-colors"
-                >
-                  閉じる
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <DiagnosisModal
+        isOpen={isMbtiModalOpen}
+        questions={mbtiQuestions}
+        onClose={handleCloseMbtiModal}
+        onComplete={handleMbtiComplete}
+        colorScheme="purple"
+        resultLabel="あなたのタイプは"
+      />
 
       {/* ラブタイプ診断モーダル */}
-      {isLoveTypeModalOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50"
-          onClick={handleCloseLoveTypeModal}
-        >
-          <div
-            className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {loveTypeSelectedAnswers.length < loveTypeQuestions.length ? (
-              <>
-                {/* 質問画面 */}
-                <h2 className="text-xl font-bold text-gray-800 mb-8 text-center">
-                  {loveTypeQuestions[loveTypeCurrentQuestion].title}
-                </h2>
-                <div className="space-y-3">
-                  {loveTypeQuestions[loveTypeCurrentQuestion].options.map(
-                    (option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => handleLoveTypeSelectAnswer(option.value)}
-                        className="w-full px-5 py-3.5 bg-pink-50 hover:bg-pink-100 text-pink-900 rounded-2xl text-sm font-medium transition-all transform hover:scale-105 active:scale-95"
-                      >
-                        {option.label}
-                      </button>
-                    )
-                  )}
-                </div>
-                <button
-                  onClick={handleCloseLoveTypeModal}
-                  className="mt-8 w-full text-gray-500 hover:text-gray-700 text-xs transition-colors"
-                >
-                  キャンセル
-                </button>
-              </>
-            ) : (
-              <>
-                {/* 結果画面 */}
-                <div className="text-center">
-                  <h2 className="text-xl font-bold text-gray-800 mb-8">
-                    診断完了！
-                  </h2>
-                  <p className="text-base text-gray-600">
-                    あなたの恋愛タイプは
-                  </p>
-                  <p className="text-3xl font-bold text-pink-600 mt-1 mb-2">
-                    {loveTypeSelectedAnswers.join("")}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">ですね！</p>
-                </div>
-                <button
-                  onClick={handleCloseLoveTypeModal}
-                  className="mt-8 w-full text-gray-500 hover:text-gray-700 text-xs transition-colors"
-                >
-                  閉じる
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <DiagnosisModal
+        isOpen={isLoveTypeModalOpen}
+        questions={loveTypeQuestions}
+        onClose={handleCloseLoveTypeModal}
+        onComplete={handleLoveTypeComplete}
+        colorScheme="pink"
+        resultLabel="あなたの恋愛タイプは"
+      />
 
       {/* Bottom Banner Area */}
       <div className="pb-6 px-6">

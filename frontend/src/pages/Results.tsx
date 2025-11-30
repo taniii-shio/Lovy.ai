@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useScrollToTop } from "../hooks/useScrollToTop";
 import type { DiagnosisResult } from "../types";
 import AdArea from "../components/advertising/AdArea";
 import { diagnosisResultStorage, userProfileStorage } from "../utils/storage";
@@ -12,6 +13,8 @@ import LifeAllocationChart from "../components/results/LifeAllocationChart";
 
 export default function Results() {
   const navigate = useNavigate();
+  useScrollToTop();
+
   const [result, setResult] = useState<DiagnosisResult | null>(null);
   const [nickname, setNickname] = useState<string>("");
   const [slotPercentage, setSlotPercentage] = useState(0);
