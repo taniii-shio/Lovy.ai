@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { DiagnosisResult } from "../types";
 import AdArea from "../components/advertising/AdArea";
@@ -27,6 +27,7 @@ export default function Results() {
     saveImage,
   } = useShareImage();
 
+  // Initial data load
   useEffect(() => {
     const resultData = diagnosisResultStorage.get();
     const profileData = userProfileStorage.get();
@@ -40,9 +41,19 @@ export default function Results() {
     setNickname(profileData.nickname);
   }, [navigate]);
 
-  // Title animation effect
+  // Debug log - only when result changes
   useEffect(() => {
-    if (!result || !nickname) return;
+    if (result) {
+      console.log("Diagnosis Result:", result);
+    }
+  }, [result]);
+
+  // Title animation effect
+  const hasNickname = !!nickname;
+  const hasResult = !!result;
+
+  useEffect(() => {
+    if (!hasResult || !hasNickname) return;
 
     const fullTitle = `${nickname}のLovyな人生`;
     const duration = 50; // milliseconds per character
@@ -58,11 +69,11 @@ export default function Results() {
     }, duration);
 
     return () => clearInterval(interval);
-  }, [result, nickname]);
+  }, [hasResult, hasNickname, nickname]);
 
   // Slot animation effect
   useEffect(() => {
-    if (!result) return;
+    if (!hasResult) return;
 
     const targetValue = 100 / 256;
     const duration = 1000;
@@ -83,27 +94,36 @@ export default function Results() {
     }, stepDuration);
 
     return () => clearInterval(interval);
-  }, [result]);
+  }, [hasResult]);
 
-  // Scroll direction detection for footer
+  // Scroll direction detection for footer (with throttling)
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const scrollDiff = currentScrollY - lastScrollY.current;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          const scrollDiff = currentScrollY - lastScrollY.current;
 
-      if (currentScrollY < 50) {
-        setShowFooter(true);
-      } else {
-        if (Math.abs(scrollDiff) > 5) {
-          if (scrollDiff > 0) {
-            setShowFooter(false);
-          } else {
+          if (currentScrollY < 50) {
             setShowFooter(true);
+          } else {
+            if (Math.abs(scrollDiff) > 5) {
+              if (scrollDiff > 0) {
+                setShowFooter(false);
+              } else {
+                setShowFooter(true);
+              }
+            }
           }
-        }
-      }
 
-      lastScrollY.current = currentScrollY;
+          lastScrollY.current = currentScrollY;
+          ticking = false;
+        });
+
+        ticking = true;
+      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -113,15 +133,15 @@ export default function Results() {
     };
   }, []);
 
-  const handleShare = async () => {
+  const handleShare = useCallback(async () => {
     await generateShareImage("share-score-content");
-  };
+  }, [generateShareImage]);
 
-  const handleSaveImage = () => {
+  const handleSaveImage = useCallback(() => {
     if (nickname) {
       saveImage(nickname);
     }
-  };
+  }, [nickname, saveImage]);
 
   if (!result) {
     return (
@@ -138,7 +158,6 @@ export default function Results() {
     loveLanguage,
     lifeAllocation,
   } = result.results;
-  console.log("Diagnosis Result:", result);
 
   return (
     <div className="relative min-h-screen">
@@ -339,9 +358,7 @@ export default function Results() {
               {/* 診断結果表示 */}
               <div className="flex flex-col items-start flex-shrink-0 max-w-[160px]">
                 <p className="text-xs text-gray-800 font-bold mb-1 w-full flex items-center">
-                  <span className="truncate flex-shrink">
-                    {nickname}
-                  </span>
+                  <span className="truncate flex-shrink">{nickname}</span>
                   <span className="flex-shrink-0">さんの診断結果</span>
                 </p>
                 <div className="flex items-center gap-2 text-sm text-gray-700 flex-shrink-0">
@@ -390,7 +407,10 @@ export default function Results() {
             aria-labelledby="share-modal-title"
           >
             <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 max-w-md w-full border border-white/50 shadow-2xl">
-              <h3 id="share-modal-title" className="text-2xl font-bold text-gray-800 text-center mb-6">
+              <h3
+                id="share-modal-title"
+                className="text-2xl font-bold text-gray-800 text-center mb-6"
+              >
                 シェア画像が完成！
               </h3>
 
